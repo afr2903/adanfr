@@ -147,7 +147,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
         {/* Heading end*/}
         <div className="row gx-5">
           {/* My Education */}
-          <div className="col-md-12">
+          <div className="col-md-6">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
@@ -160,7 +160,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                 <div
                   key={index}
                   className={
-                    "bg-white  rounded p-4 mb-4 " +
+                    "bg-white rounded p-4 mb-4 " +
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
@@ -189,11 +189,8 @@ const Resume = ({ classicHeader, darkTheme }) => {
                 </div>
               ))}
           </div>
-        </div>
-        <div className="row gx-5">
           {/* My Experience */}
-          <div className="portfolio popup-ajax-gallery">
-          <div className="col-md-12">
+          <div className="col-md-6">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
@@ -249,7 +246,6 @@ const Resume = ({ classicHeader, darkTheme }) => {
                     </div>*/}
                 </div>
               ))}
-          </div>
         </div>
 
 
