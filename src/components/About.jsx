@@ -78,7 +78,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
               <a
                 /*href={resumeFile}
                 download*/
-                href="https://afr2903.github.io/portfolio/Adan_Flores_resume.pdf"
+                href="https://adanfr.com/Adan_Flores_resume.pdf"
                 target="_blank"
                 className="btn btn-primary rounded-pill"
               >

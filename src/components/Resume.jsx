@@ -330,7 +330,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
         <div className="text-center mt-5">
           <a
             className="btn btn-outline-secondary rounded-pill shadow-none"
-            href={"https://afr2903.github.io/portfolio/Adan_Flores_resume.pdf"}
+            href={"https://adanfr.com/Adan_Flores_resume.pdf"}
             download
           >
             Download CV
