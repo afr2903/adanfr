@@ -19,7 +19,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
               (darkTheme ? "text-white" : "text-dark")
             }
           >
-            Know Me More
+            Summary
             <span className="heading-separator-line border-bottom border-3 border-primary d-block mx-auto" />
           </p>
         </div>
@@ -36,17 +36,16 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
             </h2>
             <p className={darkTheme ? "text-white-50" : ""}>
               I develop software for robotics, backend, artificial intelligence 
-              and automation applications. R&D in Mobile Robotics and Extended 
-              Reality. I'm a proficient and passionate engineering student with 
+              and automation applications. I advance Research in Robotics, AI 
+              and Extended Reality. Proficient and thorough engineer with 
               experience in software engineering and robotics, always eager to 
               learn and self-driven towards solving world problems.
             </p>
             <p className={darkTheme ? "text-white-50" : ""}>
-              With several years of experience in international robotics and 
+              With several years in internships, international robotics and 
               programming competitions as well as learning courses and personal 
               projects, I have gained outstanding skills in problem solving, 
-              research and leadership.After several years of experience in 
-              international robotics and programming competitions.
+              research and leadership.
             </p>
           </div>
           {/* About me content end */}
@@ -68,10 +67,10 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                   </a>
                 </li>
                 <li>
-                  <span className="fw-600 me-2">Age:</span>20
+                  <span className="fw-600 me-2">Age:</span>21
                 </li>
                 <li className="border-0">
-                  <span className="fw-600 me-2">From:</span>San Luis Potosí, México
+                  <span className="fw-600 me-2">Location:</span>Cambridge, MA
                 </li>
               </ul>
               <a
@@ -103,7 +102,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "text-white-50" : "text-muted")
                   }
                 >
-                  <span>5</span>+
+                  <span>3</span>
                 </h4>
                 <p className={"mb-0 " + (darkTheme ? "text-light" : "")}>
                   Years Experiance
@@ -118,10 +117,10 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "text-white-50" : "text-muted")
                   }
                 >
-                  <span>4</span>
+                  <span>2</span>
                 </h4>
                 <p className={"mb-0 " + (darkTheme ? "text-light" : "")}>
-                  Internships
+                  Research Papers
                 </p>
               </div>
             </div>
@@ -148,10 +147,10 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "text-white-50" : "text-muted")
                   }
                 >
-                  <span>30</span>+
+                  <span>4</span>
                 </h4>
                 <p className={"mb-0 " + (darkTheme ? "text-light" : "")}>
-                  Robotics & Programming competitions
+                  Internships
                 </p>
               </div>
             </div>
