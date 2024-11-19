@@ -147,7 +147,8 @@ const Resume = ({ classicHeader, darkTheme }) => {
         {/* Heading end*/}
         <div className="row gx-5">
           {/* My Education */}
-          <div className="col-md-6">
+          <div className="portfolio popup-ajax-gallery">
+          <div className="col-md-12">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
@@ -164,21 +165,39 @@ const Resume = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
-                  <div className="d-flex align-items-center mt-auto mb-4">
+                  <div className="d-flex align-items-center mt-auto mb-2">
                     <img
                       className="img-fluid rounded-circle border d-inline-block w-auto"
                       src={value.src}
                       alt=""
                       style={{ width: "50px", height: "50px"}}
                     />
-                    <p className="ms-3 mb-0">
-                        <p className="badge bg-primary text-2 fw-400">
-                          {value.yearRange}
-                        </p>
+                    <div className="ms-3 mb-0 col-md-8">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <p className="badge bg-primary text-2 fw-400 mb-0">
+                            {value.yearRange}
+                          </p>
+                          <button className="btn btn-primary btn-rounded btn-sm shadow-none"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSelectedExperienceDetails(educationDetails[index]);
+                            }}
+                            data-bs-toggle="modal"
+                            data-bs-target="#expModal"
+                            style={{
+                              padding: ".15rem 0.5rem",
+                              lineHeight: "1.25",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                          +
+                          </button>
+                        </div>
                         <h5 className={darkTheme ? "text-primary" : "text-danger"}>
                           {value.place}
                         </h5>
-                    </p>
+                    </div>
                   </div>
                         <h3 className={"text-5 " + (darkTheme ? "text-white" : "")}>
                           {value.title}
@@ -190,7 +209,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
               ))}
           </div>
           {/* My Experience */}
-          <div className="col-md-6">
+          <div className="col-md-12">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
@@ -207,21 +226,40 @@ const Resume = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
-                  <div className="d-flex align-items-center mt-auto mb-4">
+                  <div className="d-flex align-items-center mt-auto mb-2">
                     <img
                       className="img-fluid rounded-circle border d-inline-block w-auto"
                       src={value.src}
                       alt=""
                       style={{ width: "50px", height: "50px"}}
                     />
-                    <p className="ms-3 mb-0">
-                        <p className="badge bg-primary text-2 fw-400">
-                          {value.yearRange}
-                        </p>
+
+                    <div className="ms-3 mb-0 col-md-8">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <p className="badge bg-primary text-2 fw-400 mb-0">
+                            {value.yearRange}
+                          </p>
+                          <button className="btn btn-primary btn-rounded btn-sm shadow-none"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSelectedExperienceDetails(experienceDetails[index]);
+                            }}
+                            data-bs-toggle="modal"
+                            data-bs-target="#expModal"
+                            style={{
+                              padding: ".15rem 0.5rem",
+                              lineHeight: "1.25",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                          +
+                          </button>
+                        </div>
                         <h5 className={darkTheme ? "text-primary" : "text-danger"}>
                           {value.place}
                         </h5>
-                    </p>
+                    </div>
                   </div>
                         <h3 className={"text-5 " + (darkTheme ? "text-white" : "")}>
                           {value.title}
@@ -229,23 +267,9 @@ const Resume = ({ classicHeader, darkTheme }) => {
                   <p className={"mb-0 " + (darkTheme ? "text-white-50" : "")}>
                     {value.keypoints}
                   </p>
-                  {/* Details button */}{/*
-                  <div className="portfolio-box-rounded">
-                    <button className="btn btn-primary btn-rounded btn-sm shadow-none mb-3" style={{position: "relative" }}>
-                      expand
-                    <a
-                      className="popup-ajax stretched-link"
-                      href=""
-                      onClick={() => {
-                        setSelectedExperienceDetails(experienceDetails[index]);
-                      }}
-                      data-bs-toggle="modal"
-                      data-bs-target="#expModal"
-                    />
-                    </button>
-                    </div>*/}
                 </div>
               ))}
+          </div>
         </div>
 
 
