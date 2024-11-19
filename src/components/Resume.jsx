@@ -6,18 +6,29 @@ const Resume = ({ classicHeader, darkTheme }) => {
   const [selectedExperienceDetails, setSelectedExperienceDetails] = useState();
   const educationDetails = [
     {
-      yearRange: "2021 - 2025",
+      yearRange: "Aug. 2021 - June 2025",
       title: "B.S. in Mechatronics Engineering",
-      place: "Instituto Tecnológico y de Estudios Superiores de Monterrey (ITESM)",
+      place: "Tecnológico de Monterrey (ITESM)",
       src: "images/logos/tec.png",
-      desc: "Academic Scolarship holder, Robotics Research Team, Smart Factory. Relevant Coursework: Programming of Data Structures and Fundamental Algorithms, Object-Oriented Programming, Multi-Agent Systems with Computer Graphics, Industrial Automation",
+      keypoints: "GPA: 95/100. Outstanding Student Award",
+      desc: [
+        <> Academic Scolarship holder, Robotics Research Team, Smart Factory. </>,
+        <> <b>Relevant Coursework:</b> Programming of Data Structures and Algorithms, Industrial Automation, Automation of Manufacturing Systems </>
+      ],
+      location: "Monterrey, Mexico",
+      skills: "Project Management, Teamwork, Leadership, SolidWorks, Matlab",
+      thumbImage: "images/experiences/tec-imt-1.jpg",
     },
     {
-      yearRange: "2018 - 2021",
-      title: "Bicultural High School Diploma",
-      place: "Instituto Tecnológico y de Estudios Superiores de Monterrey (ITESM)",
+      yearRange: "Aug. 2018 - May 2021",
+      title: "Bicultural High School",
+      place: "Tecnológico de Monterrey (ITESM)",
       src: "images/logos/tec.png",
-      desc: "FIRST Robotics Competition Alumni, Academic honorific mention, Leadership 'Borrego de Oro' winner. Relevant Coursework: CS50, AP Calculus, AP English",
+      keypoints: "GPA: 93/10. Leadership 'Borrego de Oro'",
+      desc: [
+        <> FIRST Robotics Competition Alumni, Academic honorific mention, Leadership 'Borrego de Oro' winner. </>,
+        <> <b>Relevant Coursework:/</b> CS50, AP Calculus, AP English </>
+      ],
     },
   ];
 
@@ -88,33 +99,6 @@ const Resume = ({ classicHeader, darkTheme }) => {
     },
   ];
 
-  const skills = [
-    {
-      name: "Web Design",
-      percent: 65,
-    },
-    {
-      name: "HTML/CSS",
-      percent: 95,
-    },
-    {
-      name: "JavaScript",
-      percent: 80,
-    },
-    {
-      name: "React JS",
-      percent: 70,
-    },
-    {
-      name: "Angular Js",
-      percent: 60,
-    },
-    {
-      name: "Bootstrap",
-      percent: 99,
-    },
-  ];
-
   return (
     <>
     <section
@@ -130,7 +114,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
               (darkTheme ? "text-muted opacity-1" : "text-light opacity-4")
             }
           >
-            Summary
+            Resume
           </h2>
           <p
             className={
@@ -139,7 +123,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
             }
           >
             {" "}
-            Resume
+            My Experience
             <span className="heading-separator-line border-bottom border-3 border-primary d-block mx-auto" />
           </p>
         </div>
@@ -147,20 +131,21 @@ const Resume = ({ classicHeader, darkTheme }) => {
         <div className="row gx-5">
           {/* My Education */}
           <div className="portfolio popup-ajax-gallery">
+          {/* My Experience */}
           <div className="col-md-12">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
               }
             >
-              My Education
+              Work Experience
             </h2>
-            {educationDetails.length > 0 &&
-              educationDetails.map((value, index) => (
+            {experienceDetails.length > 0 &&
+              experienceDetails.map((value, index) => (
                 <div
                   key={index}
                   className={
-                    "bg-white rounded p-4 mb-4 " +
+                    "bg-white  rounded p-4 mb-4 " +
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
@@ -171,7 +156,8 @@ const Resume = ({ classicHeader, darkTheme }) => {
                       alt=""
                       style={{ width: "50px", height: "50px"}}
                     />
-                    <div className="ms-3 mb-0 col-md-8">
+
+                    <div className="ms-3 mb-0">
                         <div className="d-flex justify-content-between align-items-center mb-2">
                           <p className="badge bg-primary text-2 fw-400 mb-0">
                             {value.yearRange}
@@ -180,7 +166,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              setSelectedExperienceDetails(educationDetails[index]);
+                              setSelectedExperienceDetails(experienceDetails[index]);
                             }}
                             data-bs-toggle="modal"
                             data-bs-target="#expModal"
@@ -202,26 +188,25 @@ const Resume = ({ classicHeader, darkTheme }) => {
                           {value.title}
                         </h3>
                   <p className={"mb-0 " + (darkTheme ? "text-white-50" : "")}>
-                    {value.desc}
+                    {value.keypoints}
                   </p>
                 </div>
               ))}
           </div>
-          {/* My Experience */}
           <div className="col-md-12">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
               }
             >
-              My Experience
+              Education
             </h2>
-            {experienceDetails.length > 0 &&
-              experienceDetails.map((value, index) => (
+            {educationDetails.length > 0 &&
+              educationDetails.map((value, index) => (
                 <div
                   key={index}
                   className={
-                    "bg-white  rounded p-4 mb-4 " +
+                    "bg-white rounded p-4 mb-4 " +
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
@@ -232,8 +217,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                       alt=""
                       style={{ width: "50px", height: "50px"}}
                     />
-
-                    <div className="ms-3 mb-0 col-md-8">
+                    <div className="ms-3 mb-0">
                         <div className="d-flex justify-content-between align-items-center mb-2">
                           <p className="badge bg-primary text-2 fw-400 mb-0">
                             {value.yearRange}
@@ -242,7 +226,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              setSelectedExperienceDetails(experienceDetails[index]);
+                              setSelectedExperienceDetails(educationDetails[index]);
                             }}
                             data-bs-toggle="modal"
                             data-bs-target="#expModal"
@@ -280,7 +264,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
               }
             >
-              My Skills
+              Technical Skills
             </h2>
                 <div
                   className={
