@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import resumeFile from "../documents/resume.pdf";
 import ExperienceDetailsModal from "./ExperienceDetailsModal";
 
 const Resume = ({ classicHeader, darkTheme }) => {
