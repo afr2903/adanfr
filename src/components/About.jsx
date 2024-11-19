@@ -32,7 +32,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                 "text-7 fw-600 mb-3 " + (darkTheme ? "text-white" : "")
               }
             >
-              I'm <span className="text-primary">Adán Flores</span>, a Robotics Software Engineer
+              I'm <span className="text-primary">Adán Flores</span>, a Mechatronics Engineer
             </h2>
             <p className={darkTheme ? "text-white-50" : ""}>
               I develop software for robotics, backend, artificial intelligence 
@@ -117,7 +117,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                     (darkTheme ? "text-white-50" : "text-muted")
                   }
                 >
-                  <span>2</span>
+                  <span>3</span>
                 </h4>
                 <p className={"mb-0 " + (darkTheme ? "text-light" : "")}>
                   Research Papers
