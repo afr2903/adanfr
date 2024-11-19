@@ -17,6 +17,63 @@ const Portfolio = ({ classicHeader, darkTheme }) => {
 
   const projectsData = [
     {
+      title: "Neuro-adaptive meeting room",
+      projectInfo: [
+        <> Team project for the <b>Longetivy, AI and Cognitive Research </b> 
+        Hackathon at MIT Media Lab, we ideated a proposal to create a meeting room
+        capable of sensing the collective counciosness with only computer vision
+        and machine learning models. Given the users desired purpose (focus, creative, etc.)
+        it would control environmental parameters such as, lighting, projections, scent, sound.</>,
+        <>We received the Rising Star Award in the hackathon</>,
+      ],
+      client: "ekkolapto, Augmentation Lab",
+      technologies: "Research Writing, Cognitive Science, Innovative Ideation, Python, OpenCV",
+      industry: "Cognitive Science",
+      date: "October 2024",
+      urls: [ 
+        {
+          icon: "fa-solid fa-file",
+          name: "Submitted research paper",
+          link: "https://arxiv.org/abs/2410.21571",
+        },
+        {
+          icon: "fab fa-github",
+          name: "GitHub Repo",
+          link: "https://github.com/afr2903/neuroadaptive-meeting-room",
+        },
+      ],
+      thumbImage: "images/projects/symbiosis-1.png",
+      sliderImages: [
+        "images/projects/symbiosis-2.png",
+        "images/projects/symbiosis-3.jpg",
+      ],
+      categories: [filters.SOFTWARE],
+    },
+    {
+      title: "FibeR Extrusion Device Code",
+      projectInfo: [
+        <> The former code for the <b>Fiber Extrusion Device</b> developed by
+        the <a href="https://news.mit.edu/2022/factory-for-freds-mit-1005" target="_blank" rel="noopener noreferrer">Massachusetts Institute of Technology </a> 
+        was unusable for its poor readability and lack of modularity. I refactored it to improve its maintainability and scalability. </>,
+        <> The Python code was restructured into classes and functions, and
+        documented in GitHub for non-expert users. OpenCV optimizations were
+        implemented, and multithreading and memory management were improved. </>,
+      ],
+      client: "Massachusetts Institute of Technology, FrED Factory",
+      technologies: "Python, OpenCV, Raspberry Pi, Unit testing",
+      industry: "EdTech",
+      date: "October 2024",
+      urls: [ 
+        {
+          icon: "fab fa-github",
+          name: "GitHub Repo",
+          link: "https://github.com/mit-fredfactory/fred-device/",
+        },
+      ],
+      thumbImage: "images/projects/fred-device-2.png",
+      categories: [filters.MECHATRONICS],
+    },
+    {
       title: "Friendly Robotic Interactive Domestic Assistant",
       projectInfo: [
         <> Development of the <b>Friendly Robotic Interactive Domestic Assistant (FRIDA)</b>,  an autonomous service robot with my university's robotics team, to compete in <a href="https://athome.robocup.org" target="_blank" rel="noopener noreferrer">RoboCup @HOME</a> 2024 research competition in Eindhoven. Capable of environment awareness and human-robot interaction to resolve any requests. Using ROS and ROS2 framework on Ubuntu 22.04 and Linux headless systems with Docker. Leading and working on: </>,
@@ -27,7 +84,7 @@ const Portfolio = ({ classicHeader, darkTheme }) => {
       client: "Tecnológico de Monterrey, RoBorregos",
       technologies: "ROS, ROS2, Docker, C++, Python, OpenAI, Llama, PyTorch, MoveIt, PyTorch",
       industry: "Service Robotics",
-      date: "February 2024 - Present",
+      date: "February 2024 - July 2024",
       urls: [ 
         {
           icon: "fa-brands fa-youtube",
@@ -66,7 +123,7 @@ const Portfolio = ({ classicHeader, darkTheme }) => {
       client: "Tecnológico de Monterrey, University of Alberta",
       technologies: "Unity AR/VR, VIVE Pro, Modbus, ROS, Python, Latex",
       industry: "Cyber-Physical Factories",
-      date: "February 2023 - Present",
+      date: "February 2023 - March 2024",
       urls: [ 
         {
           icon: "fa-solid fa-file",
