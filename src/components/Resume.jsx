@@ -29,73 +29,104 @@ const Resume = ({ classicHeader, darkTheme }) => {
         <> FIRST Robotics Competition Alumni, Academic honorific mention, Leadership 'Borrego de Oro' winner. </>,
         <> <b>Relevant Coursework:/</b> CS50, AP Calculus, AP English </>
       ],
+      location: "San Luis Potosi, Mexico",
+      skills: "Teamwork, Leadership, International Affairs, Calculus",
+      thumbImage: "images/experiences/tec-prepa-1.jpg",
     },
   ];
 
   const experienceDetails = [
     {
-      yearRange: "Sep 2024 - Dec 2024",
-      title: "Incoming Research Intern",
-      place: "Massachussets Institute of Technology - Device Realization Laboratory",
+      yearRange: "Sep. 2024 - Dec. 2024",
+      title: "AI & VR Research Intern",
+      place: "Massachussets Institute of Technology",
       src: "images/logos/mit.png",
-      keypoints: "",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
+      keypoints: "Leading research project VIPER at FrED Factory",
+      desc: [
+        <> Industry 4.0 Research Immersion at FrED Factory from MIT Device 
+        Realization Lab. </>,
+        <> Leading a research project to enhance KPIs of factory operations, to 
+        be published at journal <b>Production & Manufacturing Research</b>. 
+        Involves a VR simulation, neural networks and a Small Language Model to 
+        create an AI decision support system. </>,
+        <> Fills research gaps in upper layers of automation pyramid</>
+      ],
+      location: "Cambridge, MA",
+      skills: "Research writing, TensorFlow, Transformers, Unity, C#, Python",
+      thumbImage: "images/experiences/mit-2.jpg", 
     },
     {
-      yearRange: "Jun 2024 - Sep 2024",
+      yearRange: "June 2024 - Sep. 2024",
       title: "Software Engineer Intern",
-      place: "Google - Cloud AI",
+      place: "Google - Cloud AI & Industry Solutions",
       src: "images/logos/google.jpg",
-      keypoints: "Vertex AI Self Service team. Developing parallel data processing pipelines in C++ to enhance data synchronization frequencies for clients.",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
+      keypoints: "Building data pipelines for Vertex AI Self Service team",
+      desc: [
+        <>  Developed core C++ components for a distributed data processing 
+        pipeline, increasing data synchronization efficiency and contributing to
+        improved search platform performance.</>,
+        <> Optimized resource consumption for data ingestion processes by 
+        refining critical C++ components and implementing rigorous SQL-based 
+        end-to-end testing, leading to a more scalable and reliable data infrastructure.</>
+      ],
+      location: "Sunnyvale, CA",
+      skills: "C++, Data Pipelines, Flume, SQL, Unit Testing, Product Launch Cycle",
+      thumbImage: "images/experiences/google-1.jpeg",
     },
     {
-      yearRange: "Jan 2023 - Present",
-      title: "Robotics Engineer & PM Intern",
+      yearRange: "Jan. 2023 - May 2024",
+      title: "Robotics Engineer Intern",
       place: "ITESM - Smart Factory",
       src: "images/logos/smart_factory.jpg",
-      keypoints: "Leading the development of a Cyber-Physical factory currently used by undergrad students and as a research project. Managing and assigning tasks to other interns in Automation, Robotics, VR and Computer vision.",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
+      keypoints: "Leading a Cyber-Physical learning factory to be used as an education and research platform.",
+      desc: [
+        <>Led the technical development of a research paper for the Conference
+        in Learning Factories.</>,
+        <>Development and integration of a cyber-physical system using modular 
+        manufacturing cells with cutting edge technology, such as, virtual reality,
+        industrial robotics, computer vision and machine learning, for a controlled
+        production environment. </>,
+        <>Manager of the Virtual Reality area, creating digital twins of the 
+        physical robots for real-time updates and remote usage.</>,
+      ],
+      location: "Monterrey, Mexico",
+      skills: "Industrial Automation, Unity, Python, ROS, Project Management",
+      thumbImage: "images/experiences/smart-factory-1.jpg",
     },
     {
-      yearRange: "Aug 2023 - March 2024",
+      yearRange: "Aug. 2023 - Mar. 2024",
       title: "Software Engineer - AI Integration",
       place: "Ixmatix Robotics",
       src: "images/logos/ixmatix.jpg",
-      keypoints: "Developing AI features with Python and Elixir for the company's math learning platform, including a dynamic content generator and a real-time voice assistant tutor. Implementing Generative AI, Text-to-Speech and Speech generation models through APIs (OpenAI, Azure, ElevenLabs).",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
+      keypoints: "Integrating AI features with Python and Elixir for a math learning platform",
+      desc: [
+        <>Developed and deployed a high-performance, real-time voice assistant 
+        platform using Python, showcasing experience in building and deploying 
+        AI-driven solutions and integrating with cloud services</>,
+        <>Optimized the platform's response times, achieving a 25% reduction in 
+        latency by implementing efficient data transfer techniques and 
+        multithreading in Python, demonstrating a focus on performance optimization. </>,
+      ],
+      location: "Remote",
+      skills: "Python, Elixir, LLMs, Speech generation, Cloud Services",
+      thumbImage: "images/experiences/ixmatix-1.jpg",
     },
     {
-      yearRange: "Dec 2023 - Present",
-      title: "Freelance Software Engineer",
-      place: "Scale AI",
-      src: "images/logos/scaleai.jpg",
-      keypoints: "Improving the performance of LLMs by providing full-stack, troubleshooting and deployment solutions to miscellaneous prompts, developing and testing in different frameworks and programming languages.",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
-    },
-    {
-      yearRange: "Sep 2022 - Present",
-      title: "Team Leader & Software Developer",
-      place: "ITESM - RoBorregos",
-      src: "images/logos/roborregos.jpg",
-      keypoints: "In charge of the internal organization of the university robotics team and handling public relations with the institution, sponsors and visitors. Developing software for different robotics areas (Behavior Integration, Manipulation, Control, etc.). Competing in national and international competitions.",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
-    },
-    {
-      yearRange: "Nov 2020 - Aug 2023",
+      yearRange: "Nov. 2020 - Aug. 2023",
       title: "Unity Developer",
       place: "Catapulta Academy",
       src: "images/logos/catapulta.jpg",
-      keypoints: "Developing an embedded video game for an educational platform from concept to completion using Unity 3D. Implemented a synchronous communication structure from React functions to Unity",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
-    },
-    {
-      yearRange: "Jul 2021 - May 2022",
-      title: "FIRST Robotics Competition Mentor",
-      place: "ITESM - LamBot 3478",
-      src: "images/logos/lambot.jpg",
-      keypoints: "Teaching High school students about Object-Oriented Programming and Robotics Engineering for the international competition FIRST. Led the team task distribution & performance of the software area, promoting teamwork and STEM skills.",
-      desc: "Lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure.",
+      keypoints: "Developing an embedded video game for an educational platform in Unity3D for Web.",
+      desc: [
+        <>Developed and debugged complex game features within a resource-constrained 
+        Unity environment, demonstrating proficiency in C#, Javascript, and 
+        cross-platform development</>,
+        <>Successfully reduced application load times by 80% through data-driven
+        analysis and optimizations</>,
+      ],
+      location: "Remote",
+      skills: "Unity, C#, Javascript, Game Development, React",
+      thumbImage: "images/experiences/catapulta-1.png",
     },
   ];
 
