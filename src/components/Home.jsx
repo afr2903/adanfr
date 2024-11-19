@@ -1,6 +1,6 @@
 import React from "react";
 import Typewriter from "typewriter-effect";
-import videobg from "../videos/home.mp4";
+//import videobg from "../videos/home.mp4";
 
 const Home = ({ classicHeader, darkTheme, handleNavClick }) => {
   return (
@@ -36,8 +36,8 @@ const Home = ({ classicHeader, darkTheme, handleNavClick }) => {
                     options={{
                       strings: [
                         "I'm Adán Flores",
-                        "I'm a Software Engineer",
-                        "I'm a Robotics Developer",
+                        "I'm a CS Researcher",
+                        "I'm a Robotics and Software Dev",
                         "I'm a Mechatronics Engineer",
                       ],
                       autoStart: true,
