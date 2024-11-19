@@ -120,8 +120,8 @@ function App() {
           </span>
         </Tooltip>
 
-        <TermsAndConditions darkTheme={darkTheme}></TermsAndConditions>
-        <Disclaimer darkTheme={darkTheme}></Disclaimer>
+        {/*<TermsAndConditions darkTheme={darkTheme}></TermsAndConditions>
+        <Disclaimer darkTheme={darkTheme}></Disclaimer>*/}
       </div>
     </>
   );

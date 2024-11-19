@@ -91,7 +91,7 @@ const ProjectDetailsModal = ({ darkTheme, projectDetails }) => {
                         (darkTheme ? " text-white" : "")
                       }
                     >
-                      Project Info:
+                      Project Description:
                     </h4>
                       {projectDetails?.projectInfo?.length > 0 &&
                         projectDetails?.projectInfo?.map((bullet, index) => (
@@ -103,7 +103,7 @@ const ProjectDetailsModal = ({ darkTheme, projectDetails }) => {
                         (darkTheme ? " text-white" : "")
                       }
                     >
-                      Project Details:
+                      Details:
                     </h4>
                     <ul
                       className={
@@ -150,7 +150,7 @@ const ProjectDetailsModal = ({ darkTheme, projectDetails }) => {
                             (darkTheme ? " text-white" : "")
                           }
                         >
-                          Duration:
+                          Period:
                         </span>
                         {projectDetails?.date}
                       </li>
