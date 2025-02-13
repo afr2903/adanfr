@@ -36,9 +36,9 @@ const Home = ({ classicHeader, darkTheme, handleNavClick }) => {
                     options={{
                       strings: [
                         "I'm Adán Flores",
-                        "I'm a CS Researcher",
-                        "I'm a Robotics and Software Dev",
-                        "I'm a Mechatronics Engineer",
+                        "I'm a Researcher",
+                        "I'm a AI and Software Engineer",
+                        "I'm a Mechatronics Major",
                       ],
                       autoStart: true,
                       loop: true,
@@ -46,7 +46,7 @@ const Home = ({ classicHeader, darkTheme, handleNavClick }) => {
                   />
                 </h2>
                 <p className="text-5 text-light mb-4">
-                  from in San Luis Potosí, México.
+                  from San Luis Potosí, México.
                 </p>
                 <a
                   href="#contact"

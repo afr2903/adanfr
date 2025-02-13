@@ -37,6 +37,20 @@ const Resume = ({ classicHeader, darkTheme }) => {
 
   const experienceDetails = [
     {
+      yearRange: "Jan. 2025 - Present",
+      title: "AI Engineer",
+      place: "Pefai",
+      src: "images/logos/pefai.jpg",
+      keypoints: "Designing and building AI agent microservice",
+      desc: [
+        <> Optimized API creation with AI from N^2 to constant, by engineering 
+        a parallel agent task distribution within the AI service, as measured 
+        by total computing time </>,
+      ],
+      location: "Remote",
+      skills: "Autogen, FastAPI, Unity, Python, Kotlin",
+    },
+    {
       yearRange: "Sep. 2024 - Dec. 2024",
       title: "AI & VR Research Intern",
       place: "Massachussets Institute of Technology",
@@ -224,20 +238,20 @@ const Resume = ({ classicHeader, darkTheme }) => {
                 </div>
               ))}
           </div>
-          <div className="col-12 col-md-6">
             <h2
               className={
-                "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
-              }
+                "text-6 fw-600 mb-4 mt-4 " + (darkTheme ? "text-white" : "")
+              } style={{textAlign: "center"}}
             >
               Education
             </h2>
+          <div className="col-12 d-flex flex-wrap gap-4 justify-content-center">
             {educationDetails.length > 0 &&
               educationDetails.map((value, index) => (
                 <div
                   key={index}
                   className={
-                    "bg-white rounded p-4 mb-4 " +
+                    "bg-white rounded p-4 col-md-5 mb-1 " +
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
@@ -292,8 +306,8 @@ const Resume = ({ classicHeader, darkTheme }) => {
           <div className="col-md-12">
             <h2
               className={
-                "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
-              }
+                "text-6 fw-600 mb-4 mt-4 " + (darkTheme ? "text-white" : "")
+              } style={{textAlign: "center"}}
             >
               Technical Skills
             </h2>

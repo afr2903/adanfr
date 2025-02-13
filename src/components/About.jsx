@@ -32,7 +32,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                 "text-7 fw-600 mb-3 " + (darkTheme ? "text-white" : "")
               }
             >
-              I'm <span className="text-primary">Adán Flores</span>, a Mechatronics Engineer
+              I'm <span className="text-primary">Adán Flores</span>, a Researcher
             </h2>
             <p className={darkTheme ? "text-white-50" : ""}>
               I develop software for robotics, backend, artificial intelligence 
@@ -70,7 +70,7 @@ const AboutUs = ({ classicHeader, darkTheme }) => {
                   <span className="fw-600 me-2">Age:</span>21
                 </li>
                 <li className="border-0">
-                  <span className="fw-600 me-2">Location:</span>Cambridge, MA
+                  <span className="fw-600 me-2">Location:</span>Monterrey, Mexico
                 </li>
               </ul>
               <a
