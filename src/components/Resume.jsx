@@ -163,20 +163,20 @@ const Resume = ({ classicHeader, darkTheme }) => {
           {/* My Education */}
           <div className="portfolio popup-ajax-gallery">
           {/* My Experience */}
-          <div className="col-md-12">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
-              }
+              } style={{textAlign: "center"}}
             >
               Work Experience
             </h2>
+          <div className="col-12 d-flex flex-wrap gap-4 justify-content-center">
             {experienceDetails.length > 0 &&
               experienceDetails.map((value, index) => (
                 <div
                   key={index}
                   className={
-                    "bg-white  rounded p-4 mb-4 " +
+                    "bg-white col-md-5 rounded p-4 mb-1 " +
                     (darkTheme ? "bg-dark" : "bg-white border")
                   }
                 >
@@ -224,7 +224,7 @@ const Resume = ({ classicHeader, darkTheme }) => {
                 </div>
               ))}
           </div>
-          <div className="col-md-12">
+          <div className="col-12 col-md-6">
             <h2
               className={
                 "text-6 fw-600 mb-4 " + (darkTheme ? "text-white" : "")
