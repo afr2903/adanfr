@@ -5,3 +5,10 @@ For deploying, I followed this [guide](https://medium.com/@amh03160/deploying-a-
 
 In squarespace I had to delete the default DNS addresses.
 The DNS propagation sometimes take a few hours.
+
+After every:
+```
+npm run deploy
+```
+
+I need to reconnect the custom domain in `Settings > Pages` tab
