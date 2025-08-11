@@ -1,14 +1,15 @@
 "use client"
 
 import { useState, useRef } from "react"
+import type React from "react"
 import { Send, Mail, MapPin, Phone } from "lucide-react"
 import emailjs from "@emailjs/browser"
 
 export default function ContactSection() {
-  const formRef = useRef(null)
+  const formRef = useRef<HTMLFormElement | null>(null)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    user_name: "",
+    user_email: "",
     subject: "",
     message: "",
   })
@@ -17,12 +18,12 @@ export default function ContactSection() {
   const [submitMessage, setSubmitMessage] = useState("")
   const [submitError, setSubmitError] = useState(false)
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitMessage("")
@@ -34,10 +35,10 @@ export default function ContactSection() {
       const templateId = "template_7k3mx64"
       const publicKey = "EXjW7JD2MiMNj_SfN"
 
-      await emailjs.sendForm(serviceId, templateId, formRef.current, publicKey)
+      await emailjs.sendForm(serviceId, templateId, formRef.current!, publicKey)
 
       setSubmitMessage("Your message has been sent successfully!")
-      setFormData({ name: "", email: "", subject: "", message: "" })
+      setFormData({ user_name: "", user_email: "", subject: "", message: "" })
 
       // Clear success message after 5 seconds
       setTimeout(() => setSubmitMessage(""), 5000)
@@ -103,14 +104,14 @@ export default function ContactSection() {
           <div>
             <h3 className="text-2xl font-bold mb-6">Send Me A Message</h3>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4" id="contact-form">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <input
                     type="text"
-                    name="name"
+                    name="user_name"
                     placeholder="Your Name"
-                    value={formData.name}
+                    value={formData.user_name}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333] rounded-lg focus:outline-none focus:border-primary transition-colors text-white"
@@ -119,9 +120,9 @@ export default function ContactSection() {
                 <div>
                   <input
                     type="email"
-                    name="email"
+                    name="user_email"
                     placeholder="Your Email"
-                    value={formData.email}
+                    value={formData.user_email}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333] rounded-lg focus:outline-none focus:border-primary transition-colors text-white"
