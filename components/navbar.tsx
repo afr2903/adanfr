@@ -61,7 +61,7 @@ export default function Navbar() {
           className="flex items-center gap-2"
         >
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            <Image src="/images/me_boston.jpg" alt="Adán Flores" width={40} height={40} className="object-cover" />
+            <Image src="/images/pf-grad-2.png" alt="Adán Flores" width={40} height={40} className="object-cover" />
           </div>
           <span className="font-bold text-lg hidden sm:inline-block">Adán Flores</span>
         </a>
