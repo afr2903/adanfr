@@ -4,6 +4,7 @@ import { Figtree, DM_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { Analytics } from "@vercel/analytics/next"
 
 const figtree = Figtree({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -37,6 +38,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   )
