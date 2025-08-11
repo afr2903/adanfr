@@ -61,7 +61,7 @@ export default function Navbar() {
           className="flex items-center gap-2"
         >
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            <Image src="/profile.jpg" alt="Adán Flores" width={40} height={40} className="object-cover" />
+            <Image src="/images/me_boston.jpg" alt="Adán Flores" width={40} height={40} className="object-cover" />
           </div>
           <span className="font-bold text-lg hidden sm:inline-block">Adán Flores</span>
         </a>
@@ -132,8 +132,8 @@ export default function Navbar() {
 
         {/* Social and Document Icons */}
         <div className="hidden md:flex items-center gap-4">
-          <a
-            href="https://linkedin.com/in/adanfr"
+           <a
+            href="https://www.linkedin.com/in/adanfr/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/70 hover:text-primary transition-colors"
@@ -141,8 +141,8 @@ export default function Navbar() {
           >
             <Linkedin size={20} />
           </a>
-          <a
-            href="https://github.com/adanfr"
+           <a
+            href="https://github.com/afr2903"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/70 hover:text-primary transition-colors"
@@ -150,8 +150,8 @@ export default function Navbar() {
           >
             <Github size={20} />
           </a>
-          <a
-            href="https://wa.me/yourphonenumber"
+           <a
+            href="https://wa.me/14083121647"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/70 hover:text-primary transition-colors"
@@ -159,8 +159,8 @@ export default function Navbar() {
           >
             <MessageCircle size={20} />
           </a>
-          <a
-            href="/cv.pdf"
+           <a
+            href="/Adan_Flores_resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/70 hover:text-primary transition-colors"
@@ -169,7 +169,7 @@ export default function Navbar() {
             <FileText size={20} />
           </a>
           <a
-            href="https://scholar.google.com/citations?user=yourprofile"
+            href="https://scholar.google.com/citations?user=lwm1mIEAAAAJ"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/70 hover:text-primary transition-colors"
@@ -255,8 +255,8 @@ export default function Navbar() {
             </a>
 
             <div className="flex items-center gap-4 py-2">
-              <a
-                href="https://linkedin.com/in/adanfr"
+               <a
+                 href="https://www.linkedin.com/in/adanfr/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-primary transition-colors"
@@ -264,8 +264,8 @@ export default function Navbar() {
               >
                 <Linkedin size={20} />
               </a>
-              <a
-                href="https://github.com/adanfr"
+               <a
+                 href="https://github.com/afr2903"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-primary transition-colors"
@@ -273,8 +273,8 @@ export default function Navbar() {
               >
                 <Github size={20} />
               </a>
-              <a
-                href="https://wa.me/yourphonenumber"
+               <a
+                 href="https://wa.me/14083121647"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-primary transition-colors"
@@ -282,8 +282,8 @@ export default function Navbar() {
               >
                 <MessageCircle size={20} />
               </a>
-              <a
-                href="/cv.pdf"
+               <a
+                 href="/Adan_Flores_resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-primary transition-colors"
@@ -292,7 +292,7 @@ export default function Navbar() {
                 <FileText size={20} />
               </a>
               <a
-                href="https://scholar.google.com/citations?user=yourprofile"
+                href="https://scholar.google.com/citations?user=lwm1mIEAAAAJ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-primary transition-colors"

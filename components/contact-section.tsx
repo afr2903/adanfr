@@ -30,9 +30,9 @@ export default function ContactSection() {
 
     try {
       // Replace these with your actual EmailJS service ID, template ID, and public key
-      const serviceId = "service_id"
-      const templateId = "template_id"
-      const publicKey = "public_key"
+      const serviceId = "service_l2n6zvj"
+      const templateId = "template_7k3mx64"
+      const publicKey = "EXjW7JD2MiMNj_SfN"
 
       await emailjs.sendForm(serviceId, templateId, formRef.current, publicKey)
 
@@ -59,9 +59,9 @@ export default function ContactSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
-            <h3 className="text-2xl font-bold mb-6">Get In Touch</h3>
+            <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
             <p className="text-white/70 mb-8">
-              I'm interested in research opportunities, especially in robotics, AI, and extended reality. If you have
+              I'm interested in research opportunities, especially in AI for robotics. If you have
               any questions or would like to discuss potential collaborations, feel free to contact me.
             </p>
 
@@ -72,7 +72,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1 text-white">Location</h4>
-                  <p className="text-white/70">Monterrey, Mexico</p>
+                  <p className="text-white/70">San Luis Potosí, México</p>
                 </div>
               </div>
 
@@ -94,7 +94,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1 text-white">Phone</h4>
-                  <p className="text-white/70">+52 (444) 123-4567</p>
+                  <p className="text-white/70">+1 (408) 312-1647</p>
                 </div>
               </div>
             </div>

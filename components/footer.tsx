@@ -24,7 +24,7 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-end">
             <div className="flex gap-4 mb-4">
               <a
-                href="https://linkedin.com/in/adanfr"
+                href="https://www.linkedin.com/in/adanfr/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-primary transition-colors"
@@ -33,7 +33,7 @@ export default function Footer() {
                 <Linkedin size={20} />
               </a>
               <a
-                href="https://github.com/adanfr"
+                href="https://github.com/afr2903"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-primary transition-colors"
@@ -42,7 +42,7 @@ export default function Footer() {
                 <Github size={20} />
               </a>
               <a
-                href="https://wa.me/yourphonenumber"
+                href="https://wa.me/14083121647"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-primary transition-colors"

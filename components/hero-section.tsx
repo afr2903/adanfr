@@ -9,7 +9,11 @@ export default function HeroSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
 
-  const phrases = ["Adán Flores", "Researcher", "Software Engineer"]
+  const phrases = [
+    "Adán Flores",
+    "Researcher",
+    "AI Engineer",
+  ]
 
   useEffect(() => {
     setIsVisible(true)
@@ -64,7 +68,7 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/hero-bg.jpg')",
+          backgroundImage: "url('/images/home-bg.JPG')",
           filter: "brightness(0.4) contrast(1.2)",
         }}
       ></div>

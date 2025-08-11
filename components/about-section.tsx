@@ -11,7 +11,7 @@ export default function AboutSection() {
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3 flex justify-center">
             <div className="relative w-64 h-64 rounded-lg overflow-hidden">
-              <Image src="/profile-photo.jpg" alt="Adán Flores" fill className="object-cover" />
+              <Image src="/images/me_boston.jpg" alt="Adán Flores" fill className="object-cover" />
             </div>
           </div>
 
@@ -37,7 +37,7 @@ export default function AboutSection() {
             </div>
 
             <div className="mt-8">
-              <h4 className="text-xl font-semibold mb-3">Interests:</h4>
+            <h4 className="text-xl font-semibold mb-3">Interests:</h4>
               <div className="flex flex-wrap gap-2">
                 <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">Robotics</span>
                 <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">Computer Vision</span>
@@ -47,6 +47,16 @@ export default function AboutSection() {
                 <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">Extended Reality</span>
                 <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">Automation</span>
               </div>
+              <h4 className="text-xl font-semibold mb-3">Details:</h4>
+              <ul className="space-y-2 text-gray-700">
+                <li><span className="font-semibold mr-2">Name:</span> Adán Flores</li>
+                <li>
+                  <span className="font-semibold mr-2">Email:</span>
+                  <a href="mailto:afr102903@gmail.com" className="text-primary hover:underline" target="_blank" rel="noreferrer">afr102903@gmail.com</a>
+                </li>
+                <li><span className="font-semibold mr-2">Location:</span> Monterrey, Mexico</li>
+              </ul>
+              <a href="/Adan_Flores_resume.pdf" target="_blank" className="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-full">Check CV</a>
             </div>
           </div>
         </div>

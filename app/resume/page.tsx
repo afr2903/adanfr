@@ -19,7 +19,7 @@ export default function ResumePage() {
 
       <div className="flex justify-center my-16">
         <a
-          href="/cv.pdf"
+          href="/Adan_Flores_resume.pdf"
           download
           className="px-8 py-3 bg-primary hover:bg-primary-700 text-white rounded-full transition-colors flex items-center gap-2"
         >
