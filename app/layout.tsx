@@ -1,14 +1,22 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Poppins } from "next/font/google"
+import { Figtree, DM_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
-const poppins = Poppins({
-  weight: ["300", "400", "500", "600", "700"],
+const figtree = Figtree({
+  weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-figtree",
+})
+
+const dmSans = DM_Sans({
+  weight: ["400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans",
 })
 
 export const metadata: Metadata = {
@@ -25,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${poppins.className} bg-[#1f1f1f] text-white`}>
+      <body className={`${figtree.variable} ${dmSans.variable} bg-[#1f1f1f] text-white`}>
         <Navbar />
         <main>{children}</main>
         <Footer />
