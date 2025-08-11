@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 246 24% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 246 24% 51%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 25%;
+  --input: 0 0% 25%;
+  --ring: 246 24% 51%;
+  --radius: 0.5rem;
+}
+
+body {
+  @apply bg-background text-foreground;
+}
+
+.section-heading {
+  @apply text-4xl font-bold relative inline-block;
+}
+
+.section-heading::after {
+  content: "";
+  @apply block h-1 w-24 bg-primary/70 mt-4 mx-auto;
+}
+
+.section-subheading {
+  @apply text-2xl font-bold mb-8;
+}
+
+.container {
+  @apply px-4 md:px-6 max-w-7xl mx-auto;
+}
+
+.section {
+  @apply py-16 md:py-24;
+}
+
+/* Alternating section backgrounds */
+#home {
+  background-color: #121212;
+  color: white;
+}
+
+#about {
+  background-color: white;
+  color: black;
+}
+
+#portfolio {
+  background-color: #121212;
+  color: white;
+}
+
+#experience {
+  background-color: white;
+  color: black;
+}
+
+#education {
+  background-color: #121212;
+  color: white;
+}
+
+#skills {
+  background-color: white;
+  color: black;
+}
+
+#contact {
+  background-color: #121212;
+  color: white;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #252525;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6965a1;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hover-lift {
+  transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+}

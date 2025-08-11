@@ -1,0 +1,100 @@
+export const projects = [
+  {
+    id: "frida",
+    title: "Friendly Robotic Interactive Domestic Assistant",
+    category: "Robotics",
+    image: "/images/frida.jpg",
+    projectInfo: [
+      "Development of the Friendly Robotic Interactive Domestic Assistant (FRIDA), an autonomous service robot with my university's robotics team, to compete in RoboCup @HOME 2024 research competition in Eindhoven. Capable of environment awareness and human-robot interaction to resolve any requests. Using ROS and ROS2 framework on Ubuntu 22.04 and Linux headless systems with Docker. Leading and working on:",
+      "● Behavior Integration: Implementing CI/CD with Docker and CMake files and merging submodules with ROS nodes to achieve adaptive behaviors.",
+      "● Object Detection/Manipulation: Using OMPL planning and MoveIt, and developing RL for a 6-DOF robotic arm with a depth camera to achieve dynamic grasping with collision avoidance. Using YoloV8 for detections.",
+      "● Human-Robot Interaction: Fine-tuning of a local LLM model to transform voice commands into robot actions. Implementation speech-to-text and embeddings transformers.",
+    ],
+    client: "Tecnológico de Monterrey, RoBorregos",
+    technologies: "ROS, ROS2, Docker, C++, Python, OpenAI, Llama, PyTorch, MoveIt, PyTorch",
+    industry: "Service Robotics",
+    date: "February 2024 - July 2024",
+    details: {
+      images: ["/images/frida.jpg", "/images/frida-2.jpg", "/images/frida-3.jpg"],
+    },
+    urls: [
+      {
+        icon: "fa-brands fa-youtube",
+        name: "Receptionist task",
+        link: "https://drive.google.com/file/d/1NkwxFQ1QE9HnnGRiESyvIKPoAZjHACSa/view?usp=drive_link",
+      },
+      {
+        icon: "fa-brands fa-youtube",
+        name: "Serve Breakfast task",
+        link: "https://drive.google.com/file/d/1NiSe3Ym0veZD8BBu9oOp9-P2FIC4RqTV/view?usp=sharing",
+      },
+      {
+        icon: "fab fa-github",
+        name: "GitHub Repo",
+        link: "https://github.com/RoBorregos/home",
+      },
+      {
+        icon: "fa-solid fa-newspaper",
+        name: "Poster presented at the university's engineering fair",
+        link: "https://drive.google.com/file/d/1A98j-gd1dZQqXc6BxjoYxWoXqjLDkyTm/view?usp=sharing",
+      },
+    ],
+  },
+  {
+    id: "fiber-extrusion",
+    title: "FibeR Extrusion Device Code",
+    category: "Mechatronics",
+    image: "/images/fiber-extrusion.jpg",
+    projectInfo: [
+      "Developed firmware and control systems for a fiber extrusion device used in materials research.",
+      "Implemented precise temperature control and motor synchronization for consistent fiber production.",
+      "Created a user interface for parameter adjustment and monitoring of the extrusion process.",
+    ],
+    client: "Tecnológico de Monterrey, Materials Research Lab",
+    technologies: "C++, Arduino, PID Control, Stepper Motors, Temperature Sensors",
+    industry: "Materials Science",
+    date: "October 2023 - January 2024",
+    details: {
+      images: ["/images/fiber-extrusion.jpg", "/images/fiber-extrusion-2.jpg"],
+    },
+    urls: [],
+  },
+  {
+    id: "virtual-twin",
+    title: "Virtual Twin for Smart Factory",
+    category: "Software",
+    image: "/images/virtual-twin.jpg",
+    projectInfo: [
+      "Created a digital twin simulation of a manufacturing facility to enable robotics skills acquisition.",
+      "Developed realistic physics-based interactions between robots and environment.",
+      "Implemented training scenarios for operators to practice complex manufacturing tasks.",
+    ],
+    client: "ITESM Smart Factory",
+    technologies: "Unity3D, C#, ROS, Digital Twin Framework, Physics Simulation",
+    industry: "Manufacturing Education",
+    date: "March 2023 - August 2023",
+    details: {
+      images: ["/images/virtual-twin.jpg", "/images/virtual-twin-2.jpg"],
+    },
+    urls: [],
+  },
+  {
+    id: "ai-immersive",
+    title: "AI-Powered Immersive Environment",
+    category: "Software",
+    image: "/images/ai-immersive.jpg",
+    projectInfo: [
+      "Designed and implemented an AI-powered immersive environment for research visualization.",
+      "Created interactive data visualization tools for complex scientific datasets.",
+      "Integrated machine learning models to provide insights and pattern recognition in the data.",
+    ],
+    client: "Research Visualization Lab",
+    technologies: "Unity3D, Python, TensorFlow, Data Visualization, VR Integration",
+    industry: "Scientific Research",
+    date: "September 2022 - February 2023",
+    details: {
+      images: ["/images/ai-immersive.jpg", "/images/ai-immersive-2.jpg"],
+    },
+    urls: [],
+  },
+]
