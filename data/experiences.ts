@@ -13,7 +13,7 @@ export const experiences = [
       organization: "Pefai",
       period: "Jan. 2025 - Present",
       location: "Remote",
-      skills: ["Autogen", "FastAPI", "Unity", "Python", "Kotlin"],
+      skills: ["Python", "Autogen", "FastAPI", "BAML", "GO", "Kotlin"],
       images: [],
     },
   },

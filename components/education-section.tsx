@@ -23,12 +23,26 @@ export default function EducationSection() {
   )
 }
 
-function EducationCard({ education }) {
+type EducationItem = {
+  id: string
+  logo?: string
+  institution: string
+  degree: string
+  period: string
+  gpa?: string
+  location?: string
+  images?: string[]
+  image?: string
+  description: string[]
+  coursework: string[]
+}
+
+function EducationCard({ education }: { education: EducationItem }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // Create an array of images if only a single image is provided
-  const images = education.images ? education.images : education.image ? [education.image] : []
+  const images: string[] = education.images ? education.images : education.image ? [education.image] : []
 
   const hasImages = images.length > 0
   const imageCount = images.length
@@ -133,7 +147,7 @@ function EducationCard({ education }) {
                   {/* Image navigation dots */}
                   {imageCount > 1 && (
                     <div className="flex justify-center mt-4 gap-2">
-                      {images.map((_, i) => (
+                  {images.map((_image, i) => (
                         <button
                           key={i}
                           onClick={() => setCurrentImageIndex(i)}
@@ -149,10 +163,12 @@ function EducationCard({ education }) {
               <div className="mb-8">
                 <h3 className="text-lg font-medium mb-4">Description:</h3>
                 <div className="space-y-4">
-                  {education.description.map((paragraph, i) => (
-                    <p key={i} className="text-white/70">
-                      {paragraph}
-                    </p>
+                  {education.description.map((paragraph: string, i: number) => (
+                    <p
+                      key={i}
+                      className="text-white/70"
+                      dangerouslySetInnerHTML={{ __html: paragraph }}
+                    />
                   ))}
                 </div>
               </div>
@@ -183,7 +199,7 @@ function EducationCard({ education }) {
                 <div>
                   <h3 className="text-lg font-medium mb-4">Relevant Coursework:</h3>
                   <div className="flex flex-wrap gap-2">
-                    {education.coursework.map((course, i) => (
+                    {education.coursework.map((course: string, i: number) => (
                       <span key={i} className="px-3 py-1 bg-[#252525] rounded-full text-sm text-white/70">
                         {course}
                       </span>
