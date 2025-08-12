@@ -4,6 +4,7 @@ import { Figtree, DM_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import ClientPathAware from "@/app/path-aware"
 import { Analytics } from "@vercel/analytics/next"
 
 const figtree = Figtree({
@@ -35,9 +36,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${figtree.variable} ${dmSans.variable} bg-[#1f1f1f] text-white`}>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <ClientPathAware>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </ClientPathAware>
         <Analytics />
       </body>
     </html>
