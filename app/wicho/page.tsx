@@ -1,9 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
+import type { WichoModal, WichoResponse } from "@/lib/wicho-types"
 
 interface ChatModal {
   id: string
@@ -19,19 +21,41 @@ export default function ChatPage() {
   const [modals, setModals] = useState<ChatModal[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isRecording, setIsRecording] = useState(false)
+  const mediaStreamRef = useRef<MediaStream | null>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null as any)
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) return
-
-    setLastMessage(message)
+    const userMessage = message
+    setLastMessage(userMessage)
     setIsTyping(true)
+    setMessage("")
 
-    // Simulate AI response with modals
-    setTimeout(() => {
-      generateModals(message)
-      setIsTyping(false)
-      setMessage("")
-    }, 2000)
+    if (ENABLE_BAML) {
+      try {
+        const res = await fetch("/api/wicho", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage }),
+        })
+        const data: WichoResponse = await res.json()
+        const mapped = mapWichoResponseToChatModals(data)
+        setModals(mapped)
+        if (ENABLE_SPEECH) speakModals(mapped)
+        if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(mapped, userMessage)
+      } catch (e) {
+        console.error("/api/wicho error", e)
+      } finally {
+        setIsTyping(false)
+      }
+    } else {
+      // Keep current local mock generation
+      setTimeout(() => {
+        generateModals(userMessage)
+        setIsTyping(false)
+      }, 1200)
+    }
   }
 
   const generateModals = (userMessage: string) => {
@@ -95,10 +119,130 @@ export default function ChatPage() {
     }
 
     setModals(newModals)
+    if (ENABLE_SPEECH) speakModals(newModals)
+    if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
+  }
+
+  function mapWichoResponseToChatModals(resp: WichoResponse): ChatModal[] {
+    const positions = [
+      { x: 20, y: 80 },
+      { x: 20, y: 200 },
+      { x: 20, y: 320 },
+    ]
+    let idx = 0
+    return (resp.modals || []).slice(0, 3).map((m) => ({
+      id: m.id,
+      type: (m.type as any) ?? "project",
+      title: m.title,
+      content: {
+        description: Array.isArray(m.body) ? m.body.join("\n") : m.body,
+        images: m.images,
+        downloadUrl: m.linkHref,
+      },
+      position: positions[Math.min(idx++, positions.length - 1)],
+    }))
+  }
+
+  function speakModals(list: ChatModal[]) {
+    try {
+      const synth = window.speechSynthesis
+      if (!synth) return
+      const first = list[0]
+      const text = first ? `${first.title}. ${typeof first.content?.description === 'string' ? first.content.description : ''}` : 'New results are ready.'
+      const utter = new SpeechSynthesisUtterance(text)
+      synth.cancel()
+      synth.speak(utter)
+    } catch {}
+  }
+
+  function saveResumeDraft(list: ChatModal[], query: string) {
+    try {
+      const expBullets: string[] = []
+      const projBullets: string[] = []
+      for (const m of list) {
+        if (m.type === "experience" && typeof m.content?.description === "string") {
+          expBullets.push(m.content.description)
+        }
+        if (m.type === "project" && typeof m.content?.description === "string") {
+          projBullets.push(m.content.description)
+        }
+      }
+      const draft = {
+        name: "Adán Flores",
+        email: "adan@example.com",
+        phone: "+1 (408) 312-1647",
+        sections: [
+          {
+            title: "Summary",
+            items: [
+              {
+                heading: "Role Fit Summary",
+                subheading: query,
+                bullets: ["Tailored summary generated from chat context."],
+              },
+            ],
+          },
+          expBullets.length > 0
+            ? {
+                title: "Experience",
+                items: expBullets.map((b) => ({ heading: "Relevant Experience", bullets: [b] })),
+              }
+            : null,
+          projBullets.length > 0
+            ? {
+                title: "Projects",
+                items: projBullets.map((b) => ({ heading: "Relevant Project", bullets: [b] })),
+              }
+            : null,
+        ].filter(Boolean),
+      }
+      localStorage.setItem("wicho_resume_draft", JSON.stringify(draft))
+    } catch {}
   }
 
   const closeModal = (id: string) => {
     setModals(modals.filter((modal) => modal.id !== id))
+  }
+
+  // Speech: use Web Speech API when enabled
+  useEffect(() => {
+    if (!ENABLE_SPEECH) return
+    const SpeechRecognitionImpl = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+    if (!SpeechRecognitionImpl) return
+    const rec: SpeechRecognition = new SpeechRecognitionImpl()
+    rec.lang = "en-US"
+    rec.continuous = false
+    rec.interimResults = true
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      let transcript = ""
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        transcript += e.results[i][0].transcript
+      }
+      setMessage(transcript)
+    }
+    rec.onend = () => setIsRecording(false)
+    recognitionRef.current = rec
+    return () => {
+      try { rec.stop() } catch {}
+    }
+  }, [])
+
+  async function toggleRecording() {
+    if (!ENABLE_SPEECH) return
+    const rec = recognitionRef.current
+    if (!rec) return
+    if (isRecording) {
+      try { rec.stop() } catch {}
+      setIsRecording(false)
+      return
+    }
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true })
+      rec.start()
+      setIsRecording(true)
+    } catch (e) {
+      console.error("mic error", e)
+    }
   }
 
   return (
@@ -238,8 +382,18 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Input Field */}
-          <div className="flex gap-3 items-center bg-[#1a1a1a]/90 backdrop-blur-md rounded-full border border-white/20 p-2">
+           {/* Input Field */}
+           <div className="flex gap-2 items-center bg-[#1a1a1a]/90 backdrop-blur-md rounded-full border border-white/20 p-2">
+             {ENABLE_SPEECH && (
+               <button
+                 type="button"
+                 onClick={toggleRecording}
+                 className={`rounded-full p-2 ${isRecording ? "bg-red-600/70" : "bg-white/10 hover:bg-white/20"}`}
+                 aria-label="Toggle voice input"
+               >
+                 {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
+               </button>
+             )}
             <input
               ref={inputRef}
               type="text"
@@ -259,7 +413,7 @@ export default function ChatPage() {
             </button>
           </div>
 
-          {/* Suggested Prompts */}
+           {/* Suggested Prompts */}
           <div className="mt-4 flex flex-wrap gap-2 justify-center">
             {["Show me your computer vision experience", "I need your resume", "Tell me about your robotics projects"].map(
               (prompt, i) => (
@@ -274,6 +428,17 @@ export default function ChatPage() {
               )
             )}
           </div>
+
+           {ENABLE_DYNAMIC_RESUME && (
+             <div className="mt-3 flex justify-center">
+               <Link
+                 href={`/resume/preview?from=wicho`}
+                 className="text-xs text-white/70 hover:text-white underline"
+               >
+                 Preview AI-tailored resume from your last prompt
+               </Link>
+             </div>
+           )}
         </div>
       </div>
     </div>
