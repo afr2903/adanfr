@@ -11,8 +11,8 @@ export default function HeroSection() {
 
   const phrases = [
     "Adán Flores",
-    "Researcher",
-    "AI Engineer",
+    "a Researcher",
+    "an AI Engineer",
   ]
 
   useEffect(() => {

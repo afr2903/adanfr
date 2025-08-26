@@ -20,11 +20,16 @@ export const education = [
     institution: "Tecnológico de Monterrey (ITESM)",
     degree: "B.S. in Mechatronics Engineering",
     period: "Aug. 2021 - June 2025",
-    gpa: "96/100. Outstanding Student Award",
+    gpa: "96/100. Leadership in Professional Development",
     location: "Monterrey, Mexico",
-    images: ["/images/experiences/tec-imt-1.jpg"],
+    images: [
+      "/images/experiences/tec-imt-1.jpg",
+      "/images/experiences/tec-imt-2.jpg",
+      "/images/experiences/tec-imt-3.jpeg",
+    ],
     description: [
       "Academic Scholarship holder, Robotics Research Team, Smart Factory.",
+      "Winner of 'Borrego de Oro' award for leadership in professional development.",
     ],
     coursework: [
       "Programming of Data Structures and Algorithms",
