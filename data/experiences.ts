@@ -32,7 +32,7 @@ export const experiences = [
       period: "Jan. 2025 - Present",
       location: "Remote",
       skills: ["Python", "Autogen", "FastAPI", "BAML", "GO", "Kotlin"],
-      images: [],
+      images: ["/images/experiences/pefai-1.jpg"],
     },
   },
   {
