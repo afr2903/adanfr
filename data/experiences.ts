@@ -2,7 +2,7 @@ export const experiences = [
   {
     id: "stealth",
     logo: "/images/logos/stealth.jpeg",
-    company: "Stealth",
+    company: "Stealth Startup",
     role: "Founding Engineer",
     period: "July. 2025 - Present",
     description: "AI voice agents for restaurants",
@@ -10,7 +10,7 @@ export const experiences = [
       description: [
         "Building voice and text agents for restaurants to take and manage orders, within their own difussion channels.",
       ],
-      organization: "Stealth",
+      organization: "Stealth Startup",
       period: "July. 2025 - Present",
       location: "Remote",
       skills: ["Python", "LiveKit", "FastAPI", "BAML"],
