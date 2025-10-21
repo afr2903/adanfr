@@ -5,7 +5,7 @@ import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff } from "lucide-
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
-import type { WichoModal, WichoResponse } from "@/lib/wicho-types"
+import type { AdamModal, AdamResponse } from "@/lib/adam-types"
 
 interface ChatModal {
   id: string
@@ -34,18 +34,18 @@ export default function ChatPage() {
 
     if (ENABLE_BAML) {
       try {
-        const res = await fetch("/api/wicho", {
+        const res = await fetch("/api/adam", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: userMessage }),
         })
-        const data: WichoResponse = await res.json()
-        const mapped = mapWichoResponseToChatModals(data)
+        const data: AdamResponse = await res.json()
+        const mapped = mapAdamResponseToChatModals(data)
         setModals(mapped)
         if (ENABLE_SPEECH) speakModals(mapped)
         if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(mapped, userMessage)
       } catch (e) {
-        console.error("/api/wicho error", e)
+        console.error("/api/adam error", e)
       } finally {
         setIsTyping(false)
       }
@@ -123,21 +123,23 @@ export default function ChatPage() {
     if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
   }
 
-  function mapWichoResponseToChatModals(resp: WichoResponse): ChatModal[] {
+  function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
     const positions = [
       { x: 20, y: 80 },
       { x: 20, y: 200 },
       { x: 20, y: 320 },
+      { x: 20, y: 440 },
     ]
     let idx = 0
-    return (resp.modals || []).slice(0, 3).map((m) => ({
+    return (resp.modals || []).slice(0, 4).map((m) => ({
       id: m.id,
-      type: (m.type as any) ?? "project",
+      type: (m.type?.toLowerCase() as any) ?? "project",
       title: m.title,
       content: {
         description: Array.isArray(m.body) ? m.body.join("\n") : m.body,
-        images: m.images,
+        images: m.images || [],
         downloadUrl: m.linkHref,
+        technologies: [], // Empty array for compatibility
       },
       position: positions[Math.min(idx++, positions.length - 1)],
     }))
@@ -196,7 +198,7 @@ export default function ChatPage() {
             : null,
         ].filter(Boolean),
       }
-      localStorage.setItem("wicho_resume_draft", JSON.stringify(draft))
+      localStorage.setItem("adam_resume_draft", JSON.stringify(draft))
     } catch {}
   }
 
@@ -276,9 +278,9 @@ export default function ChatPage() {
 
             {modal.type === "experience" && (
               <div className="space-y-4">
-                {modal.content.images && (
+                {modal.content.images && modal.content.images.length > 0 && (
                   <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.role} fill className="object-cover" />
+                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.role || modal.title || "Experience image"} fill className="object-cover" />
                   </div>
                 )}
                 <div>
@@ -315,9 +317,9 @@ export default function ChatPage() {
 
             {modal.type === "project" && (
               <div className="space-y-4">
-                {modal.content.images && (
+                {modal.content.images && modal.content.images.length > 0 && (
                   <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.title} fill className="object-cover" />
+                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.title || modal.title || "Project image"} fill className="object-cover" />
                   </div>
                 )}
                 <div>
@@ -432,7 +434,7 @@ export default function ChatPage() {
            {ENABLE_DYNAMIC_RESUME && (
              <div className="mt-3 flex justify-center">
                <Link
-                 href={`/resume/preview?from=wicho`}
+                 href={`/resume/preview?from=adam`}
                  className="text-xs text-white/70 hover:text-white underline"
                >
                  Preview AI-tailored resume from your last prompt

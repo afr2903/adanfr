@@ -1,13 +1,13 @@
-export type WichoModalType =
+export type AdamModalType =
   | "resume"
   | "experience"
   | "project"
   | "education"
   | "summary"
 
-export interface WichoModal {
+export interface AdamModal {
   id: string
-  type: WichoModalType
+  type: AdamModalType
   title: string
   body: string[] | string
   images?: string[]
@@ -16,12 +16,12 @@ export interface WichoModal {
   sourceIds?: string[]
 }
 
-export interface WichoRequest {
+export interface AdamRequest {
   message: string
 }
 
-export interface WichoResponse {
-  modals: WichoModal[]
+export interface AdamResponse {
+  modals: AdamModal[]
 }
 
 

@@ -10,7 +10,7 @@ interface Props {
   isLoading?: boolean
 }
 
-export default function WichoInput({ onSend, isLoading }: Props) {
+export default function AdamInput({ onSend, isLoading }: Props) {
   const [value, setValue] = useState("")
 
   async function handleSubmit(e: React.FormEvent) {

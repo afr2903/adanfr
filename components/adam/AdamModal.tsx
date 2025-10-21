@@ -2,14 +2,14 @@
 
 import Image from "next/image"
 import { X, Download } from "lucide-react"
-import type { WichoModal as TWichoModal } from "@/types/wicho"
+import type { AdamModal as TAdamModal } from "@/types/adam"
 
 interface Props {
-  modal: TWichoModal
+  modal: TAdamModal
   onClose: () => void
 }
 
-export default function WichoModal({ modal, onClose }: Props) {
+export default function AdamModal({ modal, onClose }: Props) {
   const isResume = modal.type === "resume"
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4">

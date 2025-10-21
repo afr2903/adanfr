@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { experiences } from "@/data/experiences"
 import { projects } from "@/data/projects"
 import { education } from "@/data/education"
-import type { WichoModal, WichoResponse } from "@/lib/wicho-types"
+import type { AdamModal, AdamResponse } from "@/lib/adam-types"
+import { b as bamlClient } from "../../../baml_client"
 
 function normalizeText(value: unknown): string {
   if (value == null) return ""
@@ -29,7 +30,7 @@ function rankByRelevance<T extends { id: string }>(items: T[], queryTokens: stri
     .map((x) => x.item)
 }
 
-function buildExperienceModal(id: string): WichoModal | null {
+function buildExperienceModal(id: string): AdamModal | null {
   const exp = experiences.find((e) => e.id === id)
   if (!exp) return null
   return {
@@ -42,7 +43,7 @@ function buildExperienceModal(id: string): WichoModal | null {
   }
 }
 
-function buildProjectModal(id: string): WichoModal | null {
+function buildProjectModal(id: string): AdamModal | null {
   const proj = projects.find((p) => p.id === id)
   if (!proj) return null
   return {
@@ -55,7 +56,7 @@ function buildProjectModal(id: string): WichoModal | null {
   }
 }
 
-function buildEducationModal(id: string): WichoModal | null {
+function buildEducationModal(id: string): AdamModal | null {
   const edu = education.find((e) => e.id === id)
   if (!edu) return null
   const images = (edu as any).images || (edu as any).image ? [(edu as any).image] : []
@@ -69,7 +70,7 @@ function buildEducationModal(id: string): WichoModal | null {
   }
 }
 
-function buildResumeModal(): WichoModal {
+function buildResumeModal(): AdamModal {
   return {
     id: "resume",
     type: "resume",
@@ -80,15 +81,19 @@ function buildResumeModal(): WichoModal {
   }
 }
 
-function buildSummaryModal(message: string, picked: WichoModal[]): WichoModal {
+function buildSummaryModal(message: string, picked: AdamModal[]): AdamModal {
   const bullets = picked
+    .filter((m) => m.type !== "summary") // Don't include summary in summary
     .map((m) => `• ${m.title}`)
     .join("\n")
+
   const body = [
-    `Here is a concise response to: \"${message}\"`,
-    "The following highlights were selected:",
-    bullets,
-  ]
+    `Based on your query: "${message}"`,
+    "",
+    "I've selected these relevant highlights:",
+    bullets || "• Check out my resume for a complete overview",
+  ].filter(Boolean)
+
   return {
     id: `summary-${Date.now()}`,
     type: "summary",
@@ -97,7 +102,7 @@ function buildSummaryModal(message: string, picked: WichoModal[]): WichoModal {
   }
 }
 
-async function generateModalsHeuristically(message: string): Promise<WichoModal[]> {
+async function generateModalsHeuristically(message: string): Promise<AdamModal[]> {
   const tokens = message
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
@@ -114,7 +119,7 @@ async function generateModalsHeuristically(message: string): Promise<WichoModal[
     normalizeText({ institution: ed.institution, degree: ed.degree, description: ed.description, coursework: ed.coursework })
   )
 
-  const modals: WichoModal[] = []
+  const modals: AdamModal[] = []
 
   // Always offer resume as one of the modals
   modals.push(buildResumeModal())
@@ -131,10 +136,10 @@ async function generateModalsHeuristically(message: string): Promise<WichoModal[
     if (m) modals.push(m)
   }
 
-  // Cap at 3
-  const capped = modals.slice(0, 3)
+  // Cap at 4
+  const capped = modals.slice(0, 4)
   const withSummary = [buildSummaryModal(message, capped), ...capped]
-  return withSummary.slice(0, 3)
+  return withSummary.slice(0, 4)
 }
 
 export async function POST(req: Request) {
@@ -144,27 +149,78 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 
-    // Try using BAML client if present (avoid bundling native module)
-    try {
-      if (process.env.GOOGLE_API_KEY) {
-        const dynamicImport = new Function("p", "return import(p)") as (p: string) => Promise<any>
-        const baml = await dynamicImport("@/baml_client").catch(() => null)
-        if (baml && (baml as any).b) {
-          const { b } = baml as any
-          const aiResp = await b.GenerateWichoModals(message)
-          const asResp: WichoResponse = aiResp
-          if (asResp && Array.isArray(asResp.modals) && asResp.modals.length > 0) {
-            return NextResponse.json(asResp)
-          }
+    console.log("\n🔵 === NEW REQUEST ===")
+    console.log("📩 User message:", message)
+    console.log("🔑 GOOGLE_API_KEY exists:", !!process.env.GOOGLE_API_KEY)
+    console.log("🔑 API Key (first 10 chars):", process.env.GOOGLE_API_KEY?.substring(0, 10))
+
+    // Try using BAML client if GOOGLE_API_KEY is set
+    if (process.env.GOOGLE_API_KEY) {
+      try {
+        console.log("🔄 BAML client imported statically")
+        console.log("✅ BAML client ready, function exists:", !!bamlClient.GenerateAdamModals)
+
+          // Prepare context for BAML
+          console.log("📝 Preparing context...")
+          const experiencesContext = experiences.map(exp =>
+            `ID: ${exp.id}\n` +
+            `Company: ${exp.company}\n` +
+            `Role: ${exp.role}\n` +
+            `Period: ${exp.period}\n` +
+            `Description: ${exp.description}\n` +
+            `Details: ${Array.isArray(exp.details.description) ? exp.details.description.join(' ') : exp.details.description}\n` +
+            `Skills: ${exp.details.skills.join(', ')}\n` +
+            `Images: ${exp.details.images.join(', ')}\n`
+          ).join('\n---\n')
+
+          const projectsContext = projects.map(proj =>
+            `ID: ${proj.id}\n` +
+            `Title: ${proj.title}\n` +
+            `Category: ${proj.category}\n` +
+            `Info: ${Array.isArray(proj.projectInfo) ? proj.projectInfo.join(' ') : proj.projectInfo}\n` +
+            `Technologies: ${proj.technologies}\n` +
+            `Industry: ${proj.industry}\n` +
+            `Date: ${proj.date}\n` +
+            `Images: ${proj.details?.images?.join(', ') || 'none'}\n`
+          ).join('\n---\n')
+
+        console.log("📊 Context prepared - Experiences:", experiences.length, "Projects:", projects.length)
+        console.log("🚀 Calling BAML GenerateAdamModals...")
+
+        const startTime = Date.now()
+        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext)
+        const duration = Date.now() - startTime
+
+        console.log(`⏱️  BAML call completed in ${duration}ms`)
+        console.log("📦 Raw BAML response:", JSON.stringify(aiResp, null, 2))
+
+        const asResp: AdamResponse = aiResp
+
+        if (asResp && Array.isArray(asResp.modals) && asResp.modals.length > 0) {
+          console.log("✅ BAML response generated successfully")
+          console.log("📋 Number of modals:", asResp.modals.length)
+          console.log("📋 Modal types:", asResp.modals.map(m => m.type).join(", "))
+          return NextResponse.json(asResp)
+        } else {
+          console.log("⚠️  BAML response invalid or empty, falling back to heuristics")
+        }
+      } catch (bamlError) {
+        console.error("❌ BAML error, falling back to heuristics:")
+        console.error(bamlError)
+        if (bamlError instanceof Error) {
+          console.error("Error stack:", bamlError.stack)
         }
       }
-    } catch {}
+    } else {
+      console.log("⚠️  No GOOGLE_API_KEY found, using heuristics")
+    }
 
     // Fallback heuristic
+    console.log("Using heuristic fallback")
     const modals = await generateModalsHeuristically(message)
-    return NextResponse.json({ modals } satisfies WichoResponse)
+    return NextResponse.json({ modals } satisfies AdamResponse)
   } catch (error) {
-    console.error("/api/wicho error", error)
+    console.error("/api/adam error", error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }

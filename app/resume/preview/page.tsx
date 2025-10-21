@@ -17,7 +17,7 @@ export default function ResumePreviewPage() {
 
   useEffect(() => {
     // Read draft resume from localStorage placed by chat (future work)
-    const saved = localStorage.getItem("wicho_resume_draft")
+    const saved = localStorage.getItem("adam_resume_draft")
     if (saved) setJson(saved)
   }, [])
 

@@ -1,7 +1,7 @@
 // Feature flags for Wicho-related functionality
 // Toggle to test without changing server or BAML availability
 
-export const ENABLE_BAML = false
+export const ENABLE_BAML = true
 export const ENABLE_DYNAMIC_RESUME = true
 export const ENABLE_SPEECH = false
 

@@ -125,7 +125,7 @@ export default function HeroSection() {
               View My Work
             </a>
             <Link
-              href="/wicho"
+              href="/adam"
               className="relative px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 justify-center shadow-lg overflow-hidden group animate-[breathe_3s_ease-in-out_infinite]"
             >
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
