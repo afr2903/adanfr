@@ -1,20 +1,5 @@
 export const education = [
   {
-    id: "itesm-phd",
-    logo: "/images/logos/tec.png",
-    institution: "Tecnológico de Monterrey (ITESM)",
-    degree: "Ph.D. in Computer Science (Robotics)",
-    period: "Sep. 2025 - Present",
-    location: "Monterrey, Mexico",
-    images: [],
-    description: [
-      "-"
-    ],
-    coursework: [
-      "-"
-    ],
-  },
-  {
     id: "itesm-bs",
     logo: "/images/logos/tec.png",
     institution: "Tecnológico de Monterrey (ITESM)",
