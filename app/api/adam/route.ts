@@ -151,11 +151,10 @@ export async function POST(req: Request) {
 
     console.log("\n🔵 === NEW REQUEST ===")
     console.log("📩 User message:", message)
-    console.log("🔑 GOOGLE_API_KEY exists:", !!process.env.GOOGLE_API_KEY)
-    console.log("🔑 API Key (first 10 chars):", process.env.GOOGLE_API_KEY?.substring(0, 10))
+    console.log("🔑 OPENROUTER_API_KEY exists:", !!process.env.OPENROUTER_API_KEY)
 
-    // Try using BAML client if GOOGLE_API_KEY is set
-    if (process.env.GOOGLE_API_KEY) {
+    // Try using BAML client if OPENROUTER_API_KEY is set
+    if (process.env.OPENROUTER_API_KEY) {
       try {
         console.log("🔄 BAML client imported statically")
         console.log("✅ BAML client ready, function exists:", !!bamlClient.GenerateAdamModals)
@@ -212,7 +211,7 @@ export async function POST(req: Request) {
         }
       }
     } else {
-      console.log("⚠️  No GOOGLE_API_KEY found, using heuristics")
+      console.log("⚠️  No OPENROUTER_API_KEY found, using heuristics")
     }
 
     // Fallback heuristic

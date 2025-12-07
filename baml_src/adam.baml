@@ -28,7 +28,7 @@ function GenerateAdamModals(
   experiences_context: string,
   projects_context: string
 ) -> AdamResponse {
-  client GEMINI_PRO_2_5
+  client FLASH_2_5
 
   prompt #"
     You are Adam, an AI assistant for Adán Flores' portfolio website. Your role is to help visitors learn about Adán's professional experience, projects, skills, and background.

@@ -1,83 +1,61 @@
 // Learn more about clients at https://docs.boundaryml.com/docs/snippets/clients/overview
 
-client<llm> CustomGPT4o {
-  provider openai
-  options {
-    model "gpt-4o"
-    api_key env.OPENAI_API_KEY
-  }
-}
-
-client<llm> CustomGPT4oMini {
-  provider openai
-  retry_policy Exponential
-  options {
-    model "gpt-4o-mini"
-    api_key env.OPENAI_API_KEY
-  }
-}
-
-client<llm> CustomSonnet {
-  provider anthropic
-  options {
-    model "claude-3-5-sonnet-20241022"
-    api_key env.ANTHROPIC_API_KEY
-  }
-}
-
-
-client<llm> CustomHaiku {
-  provider anthropic
+// OpenRouter clients (recommended - single API for all models)
+client<llm> FLASH_2_5 {
+  provider "openai-generic"
   retry_policy Constant
   options {
-    model "claude-3-haiku-20240307"
-    api_key env.ANTHROPIC_API_KEY
+    base_url env.OPENROUTER_URL
+    api_key env.OPENROUTER_API_KEY
+    model "google/gemini-2.5-flash"
+    max_tokens 16384
   }
 }
 
-// https://docs.boundaryml.com/docs/snippets/clients/round-robin
-client<llm> CustomFast {
-  provider round-robin
+client<llm> FLASH_2_5_LITE {
+  provider "openai-generic"
+  retry_policy Constant
   options {
-    // This will alternate between the two clients
-    strategy [CustomGPT4oMini, CustomHaiku]
+    base_url env.OPENROUTER_URL
+    api_key env.OPENROUTER_API_KEY
+    model "google/gemini-2.5-flash-lite"
+    max_tokens 16384
   }
 }
 
-// https://docs.boundaryml.com/docs/snippets/clients/fallback
-client<llm> OpenaiFallback {
+client<llm> GPT_4O_MINI {
+  provider "openai-generic"
+  retry_policy Constant
+  options {
+    base_url env.OPENROUTER_URL
+    api_key env.OPENROUTER_API_KEY
+    model "openai/gpt-4o-mini"
+    max_tokens 16384
+  }
+}
+
+client<llm> CLAUDE_SONNET {
+  provider "openai-generic"
+  retry_policy Constant
+  options {
+    base_url env.OPENROUTER_URL
+    api_key env.OPENROUTER_API_KEY
+    model "anthropic/claude-sonnet-4"
+    max_tokens 16384
+  }
+}
+
+// Fallback strategy: try Flash 2.5 first, then GPT-4o-mini
+client<llm> AdamFallback {
   provider fallback
   options {
-    // This will try the clients in order until one succeeds
-    strategy [CustomGPT4oMini, CustomGPT4oMini]
-  }
-}
-
-client<llm> GEMINI_FLASH_LITE_2_5 {
-  provider "google-ai"
-  options {
-    model "gemini-2.5-flash-lite"
-  }
-}
-
-client<llm> GEMINI_FLASH_2_5 {
-  provider "google-ai"
-  options {
-    model "gemini-2.5-flash"
-  }
-}
-
-client<llm> GEMINI_PRO_2_5 {
-  provider "google-ai"
-  options {
-    model "gemini-2.5-pro"
+    strategy [FLASH_2_5, GPT_4O_MINI]
   }
 }
 
 // https://docs.boundaryml.com/docs/snippets/clients/retry
 retry_policy Constant {
   max_retries 3
-  // Strategy is optional
   strategy {
     type constant_delay
     delay_ms 200
@@ -86,7 +64,6 @@ retry_policy Constant {
 
 retry_policy Exponential {
   max_retries 2
-  // Strategy is optional
   strategy {
     type exponential_backoff
     delay_ms 300

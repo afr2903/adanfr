@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "baml:generate": "npx baml-cli generate",
+    "dev": "npm run baml:generate && next dev",
+    "build": "npm run baml:generate && next build",
     "start": "next start",
     "lint": "next lint"
   },

@@ -9,7 +9,7 @@ import type { AdamModal, AdamResponse } from "@/lib/adam-types"
 
 interface ChatModal {
   id: string
-  type: "experience" | "resume" | "project"
+  type: "experience" | "resume" | "project" | "summary" | "education"
   title: string
   content: any
   position: { x: number; y: number }
@@ -344,6 +344,23 @@ export default function ChatPage() {
                     View Demo
                   </a>
                 )}
+              </div>
+            )}
+
+            {modal.type === "summary" && (
+              <div className="space-y-4">
+                <p className="text-white/80 text-sm whitespace-pre-line">{modal.content.description}</p>
+              </div>
+            )}
+
+            {modal.type === "education" && (
+              <div className="space-y-4">
+                {modal.content.images && modal.content.images.length > 0 && (
+                  <div className="aspect-video relative rounded-lg overflow-hidden">
+                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.title || "Education image"} fill className="object-cover" />
+                  </div>
+                )}
+                <p className="text-white/80 text-sm">{modal.content.description}</p>
               </div>
             )}
           </div>
