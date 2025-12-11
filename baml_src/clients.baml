@@ -1,7 +1,7 @@
 // Learn more about clients at https://docs.boundaryml.com/docs/snippets/clients/overview
 
 // OpenRouter clients (recommended - single API for all models)
-client<llm> FLASH_2_5 {
+client<llm> GEMINI_FLASH_2_5 {
   provider "openai-generic"
   retry_policy Constant
   options {
@@ -12,7 +12,7 @@ client<llm> FLASH_2_5 {
   }
 }
 
-client<llm> FLASH_2_5_LITE {
+client<llm> GEMINI_FLASH_2_5_LITE {
   provider "openai-generic"
   retry_policy Constant
   options {
@@ -49,7 +49,7 @@ client<llm> CLAUDE_SONNET {
 client<llm> AdamFallback {
   provider fallback
   options {
-    strategy [FLASH_2_5, GPT_4O_MINI]
+    strategy [GEMINI_FLASH_2_5, GPT_4O_MINI]
   }
 }
 

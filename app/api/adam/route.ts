@@ -144,13 +144,19 @@ async function generateModalsHeuristically(message: string): Promise<AdamModal[]
 
 export async function POST(req: Request) {
   try {
-    const { message } = (await req.json()) as { message?: string }
+    const { message, history } = (await req.json()) as { message?: string; history?: string[] }
     if (!message || typeof message !== "string") {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 
+    // Format conversation history for the prompt
+    const conversationHistory = Array.isArray(history) && history.length > 0
+      ? history.map((h, i) => `[${i % 2 === 0 ? 'User' : 'Assistant'}]: ${h}`).join('\n')
+      : ''
+
     console.log("\n🔵 === NEW REQUEST ===")
     console.log("📩 User message:", message)
+    console.log("📜 Conversation history entries:", history?.length || 0)
     console.log("🔑 OPENROUTER_API_KEY exists:", !!process.env.OPENROUTER_API_KEY)
 
     // Try using BAML client if OPENROUTER_API_KEY is set
@@ -187,7 +193,7 @@ export async function POST(req: Request) {
         console.log("🚀 Calling BAML GenerateAdamModals...")
 
         const startTime = Date.now()
-        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext)
+        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext, conversationHistory)
         const duration = Date.now() - startTime
 
         console.log(`⏱️  BAML call completed in ${duration}ms`)

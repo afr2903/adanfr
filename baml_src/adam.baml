@@ -13,6 +13,7 @@ class AdamModal {
   type AdamModalType @description("Type of modal to display")
   title string @description("Title/headline for the modal card")
   body string[] @description("Array of description paragraphs or bullet points")
+  reasoning string | null @description("Brief explanation of why this modal was selected for the query - be specific about the connection")
   images string[] | null @description("Optional array of image URLs to display")
   linkHref string | null @description("Optional link URL (e.g., for resume PDF)")
   linkLabel string | null @description("Optional label for the link button")
@@ -26,14 +27,20 @@ class AdamResponse {
 function GenerateAdamModals(
   user_message: string,
   experiences_context: string,
-  projects_context: string
+  projects_context: string,
+  conversation_history: string
 ) -> AdamResponse {
-  client FLASH_2_5
+  client GEMINI_FLASH_2_5
 
   prompt #"
     You are Adam, an AI assistant for Adán Flores' portfolio website. Your role is to help visitors learn about Adán's professional experience, projects, skills, and background.
 
-    USER REQUEST:
+    {% if conversation_history %}
+    CONVERSATION HISTORY:
+    {{ conversation_history }}
+    {% endif %}
+
+    CURRENT USER REQUEST:
     {{ user_message }}
 
     AVAILABLE DATA:
@@ -78,6 +85,7 @@ function GenerateAdamModals(
         "Developed core C++ components for distributed data processing pipeline",
         "Optimized resource consumption and implemented SQL-based testing"
       ],
+      "reasoning": "Selected because your query mentions data pipelines, and this role involved building distributed data processing infrastructure at scale.",
       "images": ["/images/experiences/google-1.jpeg"],
       "linkHref": null,
       "linkLabel": null,
@@ -94,6 +102,7 @@ function GenerateAdamModals(
         "Led behavior integration with Docker CI/CD and ROS nodes",
         "Implemented object detection with YoloV8 and robotic arm manipulation with MoveIt"
       ],
+      "reasoning": "This project demonstrates hands-on robotics and AI integration experience directly relevant to your interest in autonomous systems.",
       "images": ["/images/projects/frida-1.jpeg"],
       "linkHref": null,
       "linkLabel": null,
@@ -106,6 +115,10 @@ function GenerateAdamModals(
     - Match the tone: professional yet approachable
     - Prioritize the most relevant items for the user's query
     - Always use real image paths from the data when available
+    - If there is conversation history, use it to understand context and refine your response
+    - Handle follow-up requests like "tell me more", "show something else", "focus on X instead"
+    - Don't repeat the same modals unless explicitly asked; show variety when appropriate
+    - ALWAYS include a "reasoning" field explaining WHY you selected each modal - be specific about the connection to the user's query
 
     {{ ctx.output_format }}
   "#

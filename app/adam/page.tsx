@@ -1,47 +1,124 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
-import type { AdamModal, AdamResponse } from "@/lib/adam-types"
+import type { AdamModal, AdamResponse, LensType } from "@/lib/adam-types"
+import { LENS_CONTEXTS } from "@/lib/adam-types"
 
 interface ChatModal {
   id: string
   type: "experience" | "resume" | "project" | "summary" | "education"
   title: string
   content: any
+  reasoning?: string | null
   position: { x: number; y: number }
 }
 
+const LENS_LABELS: Record<LensType, string> = {
+  none: 'All',
+  recruiter: 'Recruiter',
+  collaborator: 'Collaborator',
+  researcher: 'Researcher',
+  founder: 'Founder'
+}
+
+interface ConversationEntry {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: number
+}
+
+const STORAGE_KEY = 'adam_conversation_history'
+
 export default function ChatPage() {
   const [message, setMessage] = useState("")
-  const [lastMessage, setLastMessage] = useState("")
+  const [conversationHistory, setConversationHistory] = useState<ConversationEntry[]>([])
   const [modals, setModals] = useState<ChatModal[]>([])
   const [isTyping, setIsTyping] = useState(false)
+  const [activeLens, setActiveLens] = useState<LensType>('none')
   const inputRef = useRef<HTMLInputElement>(null)
   const [isRecording, setIsRecording] = useState(false)
   const mediaStreamRef = useRef<MediaStream | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null as any)
 
+  // Load conversation history from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        setConversationHistory(JSON.parse(stored))
+      }
+    } catch {}
+  }, [])
+
+  // Save conversation history to sessionStorage
+  const saveHistory = (history: ConversationEntry[]) => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history))
+    } catch {}
+  }
+
+  // Clear conversation
+  const clearConversation = () => {
+    setConversationHistory([])
+    setModals([])
+    try {
+      sessionStorage.removeItem(STORAGE_KEY)
+    } catch {}
+  }
+
+  // Get history as string array for API (alternating user/assistant messages)
+  const getHistoryForAPI = (): string[] => {
+    return conversationHistory.map(entry => entry.content)
+  }
+
   const handleSendMessage = async () => {
     if (!message.trim()) return
     const userMessage = message
-    setLastMessage(userMessage)
     setIsTyping(true)
     setMessage("")
+
+    // Prepend lens context if active
+    const lensContext = LENS_CONTEXTS[activeLens]
+    const messageWithLens = lensContext ? `${lensContext}\n${userMessage}` : userMessage
+
+    // Add user message to history (without lens prefix for cleaner display)
+    const userEntry: ConversationEntry = {
+      role: 'user',
+      content: userMessage,
+      timestamp: Date.now()
+    }
+    const updatedHistory = [...conversationHistory, userEntry]
+    setConversationHistory(updatedHistory)
 
     if (ENABLE_BAML) {
       try {
         const res = await fetch("/api/adam", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: userMessage }),
+          body: JSON.stringify({
+            message: messageWithLens, // Send message with lens context
+            history: getHistoryForAPI() // Send previous history (before this message)
+          }),
         })
         const data: AdamResponse = await res.json()
         const mapped = mapAdamResponseToChatModals(data)
         setModals(mapped)
+
+        // Add assistant response summary to history
+        const assistantSummary = mapped.map(m => m.title).join(', ')
+        const assistantEntry: ConversationEntry = {
+          role: 'assistant',
+          content: `Showed: ${assistantSummary}`,
+          timestamp: Date.now()
+        }
+        const finalHistory = [...updatedHistory, assistantEntry]
+        setConversationHistory(finalHistory)
+        saveHistory(finalHistory)
+
         if (ENABLE_SPEECH) speakModals(mapped)
         if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(mapped, userMessage)
       } catch (e) {
@@ -141,6 +218,7 @@ export default function ChatPage() {
         downloadUrl: m.linkHref,
         technologies: [], // Empty array for compatibility
       },
+      reasoning: m.reasoning,
       position: positions[Math.min(idx++, positions.length - 1)],
     }))
   }
@@ -363,29 +441,82 @@ export default function ChatPage() {
                 <p className="text-white/80 text-sm">{modal.content.description}</p>
               </div>
             )}
+
+            {/* AI Reasoning - Transparent AI */}
+            {modal.reasoning && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <p className="text-white/50 text-xs italic">
+                  <span className="text-purple-400/70">Why this was selected:</span> {modal.reasoning}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       ))}
 
-      <Link
-        href="/"
-        className="fixed top-6 left-6 z-30 flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20"
-      >
-        <ArrowLeft size={18} />
-        <span className="hidden sm:inline">Back</span>
-      </Link>
+      {/* Top Navigation */}
+      <div className="fixed top-6 left-6 right-6 z-30 flex items-center justify-between">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20"
+        >
+          <ArrowLeft size={18} />
+          <span className="hidden sm:inline">Back</span>
+        </Link>
+
+        {conversationHistory.length > 0 && (
+          <button
+            onClick={clearConversation}
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20"
+          >
+            <RotateCcw size={18} />
+            <span className="hidden sm:inline">Clear Chat</span>
+          </button>
+        )}
+      </div>
 
       {/* Chat Input Area */}
       <div className="fixed bottom-0 left-0 right-0 z-10 p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          {/* Last Message Display */}
-          {lastMessage && (
-            <div className="mb-4 p-3 bg-[#1a1a1a]/80 backdrop-blur-md rounded-lg border border-white/10">
-              <p className="text-white/80 text-sm">
-                <span className="text-white/60">You:</span> {lastMessage}
-              </p>
+          {/* Conversation History Display */}
+          {conversationHistory.length > 0 && (
+            <div className="mb-4 max-h-32 overflow-y-auto space-y-2">
+              {conversationHistory.slice(-4).map((entry, i) => (
+                <div
+                  key={entry.timestamp}
+                  className={`p-2 rounded-lg text-sm ${
+                    entry.role === 'user'
+                      ? 'bg-[#1a1a1a]/80 border border-white/10'
+                      : 'bg-purple-600/20 border border-purple-500/20'
+                  }`}
+                >
+                  <span className="text-white/60">
+                    {entry.role === 'user' ? 'You: ' : 'Adam: '}
+                  </span>
+                  <span className="text-white/80">{entry.content}</span>
+                </div>
+              ))}
             </div>
           )}
+
+          {/* Lens Selector */}
+          <div className="mb-3 flex flex-wrap gap-2 justify-center">
+            <span className="text-white/40 text-xs self-center mr-1">View as:</span>
+            {(Object.keys(LENS_LABELS) as LensType[]).map((lens) => (
+              <button
+                key={lens}
+                onClick={() => setActiveLens(lens)}
+                disabled={isTyping}
+                className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
+                  activeLens === lens
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                }`}
+              >
+                {LENS_LABELS[lens]}
+              </button>
+            ))}
+          </div>
 
           {/* Typing Indicator */}
           {isTyping && (
