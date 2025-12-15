@@ -1,20 +1,21 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw } from "lucide-react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
-import type { AdamModal, AdamResponse, LensType } from "@/lib/adam-types"
+import type { AdamResponse, LensType } from "@/lib/adam-types"
 import { LENS_CONTEXTS } from "@/lib/adam-types"
+
+// --- Types ---
 
 interface ChatModal {
   id: string
   type: "experience" | "resume" | "project" | "summary" | "education"
-  title: string
+  title?: string
   content: any
   reasoning?: string | null
-  position: { x: number; y: number }
 }
 
 const LENS_LABELS: Record<LensType, string> = {
@@ -34,257 +35,36 @@ interface ConversationEntry {
 const STORAGE_KEY = 'adam_conversation_history'
 
 export default function ChatPage() {
+  // --- State ---
   const [message, setMessage] = useState("")
   const [conversationHistory, setConversationHistory] = useState<ConversationEntry[]>([])
   const [modals, setModals] = useState<ChatModal[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [activeLens, setActiveLens] = useState<LensType>('none')
-  const inputRef = useRef<HTMLInputElement>(null)
   const [isRecording, setIsRecording] = useState(false)
-  const mediaStreamRef = useRef<MediaStream | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+  // Refs
+  const inputRef = useRef<HTMLInputElement>(null)
+  const chatBottomRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null as any)
 
-  // Load conversation history from sessionStorage on mount
+  // --- Effects ---
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem(STORAGE_KEY)
       if (stored) {
         setConversationHistory(JSON.parse(stored))
       }
-    } catch {}
+    } catch { }
   }, [])
 
-  // Save conversation history to sessionStorage
-  const saveHistory = (history: ConversationEntry[]) => {
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history))
-    } catch {}
-  }
-
-  // Clear conversation
-  const clearConversation = () => {
-    setConversationHistory([])
-    setModals([])
-    try {
-      sessionStorage.removeItem(STORAGE_KEY)
-    } catch {}
-  }
-
-  // Get history as string array for API (alternating user/assistant messages)
-  const getHistoryForAPI = (): string[] => {
-    return conversationHistory.map(entry => entry.content)
-  }
-
-  const handleSendMessage = async () => {
-    if (!message.trim()) return
-    const userMessage = message
-    setIsTyping(true)
-    setMessage("")
-
-    // Prepend lens context if active
-    const lensContext = LENS_CONTEXTS[activeLens]
-    const messageWithLens = lensContext ? `${lensContext}\n${userMessage}` : userMessage
-
-    // Add user message to history (without lens prefix for cleaner display)
-    const userEntry: ConversationEntry = {
-      role: 'user',
-      content: userMessage,
-      timestamp: Date.now()
+  useEffect(() => {
+    if (isSidebarOpen) {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-    const updatedHistory = [...conversationHistory, userEntry]
-    setConversationHistory(updatedHistory)
+  }, [conversationHistory, isSidebarOpen])
 
-    if (ENABLE_BAML) {
-      try {
-        const res = await fetch("/api/adam", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: messageWithLens, // Send message with lens context
-            history: getHistoryForAPI() // Send previous history (before this message)
-          }),
-        })
-        const data: AdamResponse = await res.json()
-        const mapped = mapAdamResponseToChatModals(data)
-        setModals(mapped)
-
-        // Add assistant response summary to history
-        const assistantSummary = mapped.map(m => m.title).join(', ')
-        const assistantEntry: ConversationEntry = {
-          role: 'assistant',
-          content: `Showed: ${assistantSummary}`,
-          timestamp: Date.now()
-        }
-        const finalHistory = [...updatedHistory, assistantEntry]
-        setConversationHistory(finalHistory)
-        saveHistory(finalHistory)
-
-        if (ENABLE_SPEECH) speakModals(mapped)
-        if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(mapped, userMessage)
-      } catch (e) {
-        console.error("/api/adam error", e)
-      } finally {
-        setIsTyping(false)
-      }
-    } else {
-      // Keep current local mock generation
-      setTimeout(() => {
-        generateModals(userMessage)
-        setIsTyping(false)
-      }, 1200)
-    }
-  }
-
-  const generateModals = (userMessage: string) => {
-    // Mock modal generation based on message content
-    const newModals: ChatModal[] = []
-
-    const positions = [
-      { x: 20, y: 80 },
-      { x: 20, y: 200 },
-      { x: 20, y: 320 },
-    ]
-
-    let modalIndex = 0
-
-    if (userMessage.toLowerCase().includes("computer vision") || userMessage.toLowerCase().includes("cv")) {
-      newModals.push({
-        id: "1",
-        type: "experience",
-        title: "Computer Vision Experience",
-        content: {
-          role: "Computer Vision Engineer",
-          company: "Tech Corp",
-          duration: "2022 - Present",
-          description: "Developed advanced computer vision algorithms for robotic perception and autonomous navigation.",
-          technologies: ["OpenCV", "PyTorch", "YOLO", "ROS"],
-          images: ["/computer-vision-project.png"],
-        },
-        position: positions[modalIndex++],
-      })
-    }
-
-    if (userMessage.toLowerCase().includes("resume") || userMessage.toLowerCase().includes("cv")) {
-      newModals.push({
-        id: "2",
-        type: "resume",
-        title: "Download Resume",
-        content: {
-          description: "Complete professional resume with all experience, education, and skills.",
-          downloadUrl: "/Adan_Flores_resume.pdf",
-          lastUpdated: "January 2025",
-        },
-        position: positions[modalIndex++],
-      })
-    }
-
-    if (userMessage.toLowerCase().includes("project") || userMessage.toLowerCase().includes("robotics")) {
-      newModals.push({
-        id: "3",
-        type: "project",
-        title: "Robotics Project Showcase",
-        content: {
-          title: "Autonomous Navigation Robot",
-          description:
-            "Developed a fully autonomous robot capable of navigation in complex environments using SLAM and computer vision.",
-          technologies: ["ROS", "Python", "C++", "OpenCV", "PCL"],
-          images: ["/autonomous-robot-navigation.png"],
-          demoUrl: "https://youtube.com/watch?v=demo",
-        },
-        position: positions[modalIndex++],
-      })
-    }
-
-    setModals(newModals)
-    if (ENABLE_SPEECH) speakModals(newModals)
-    if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
-  }
-
-  function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
-    const positions = [
-      { x: 20, y: 80 },
-      { x: 20, y: 200 },
-      { x: 20, y: 320 },
-      { x: 20, y: 440 },
-    ]
-    let idx = 0
-    return (resp.modals || []).slice(0, 4).map((m) => ({
-      id: m.id,
-      type: (m.type?.toLowerCase() as any) ?? "project",
-      title: m.title,
-      content: {
-        description: Array.isArray(m.body) ? m.body.join("\n") : m.body,
-        images: m.images || [],
-        downloadUrl: m.linkHref,
-        technologies: [], // Empty array for compatibility
-      },
-      reasoning: m.reasoning,
-      position: positions[Math.min(idx++, positions.length - 1)],
-    }))
-  }
-
-  function speakModals(list: ChatModal[]) {
-    try {
-      const synth = window.speechSynthesis
-      if (!synth) return
-      const first = list[0]
-      const text = first ? `${first.title}. ${typeof first.content?.description === 'string' ? first.content.description : ''}` : 'New results are ready.'
-      const utter = new SpeechSynthesisUtterance(text)
-      synth.cancel()
-      synth.speak(utter)
-    } catch {}
-  }
-
-  function saveResumeDraft(list: ChatModal[], query: string) {
-    try {
-      const expBullets: string[] = []
-      const projBullets: string[] = []
-      for (const m of list) {
-        if (m.type === "experience" && typeof m.content?.description === "string") {
-          expBullets.push(m.content.description)
-        }
-        if (m.type === "project" && typeof m.content?.description === "string") {
-          projBullets.push(m.content.description)
-        }
-      }
-      const draft = {
-        name: "Adán Flores",
-        email: "adan@example.com",
-        phone: "+1 (408) 312-1647",
-        sections: [
-          {
-            title: "Summary",
-            items: [
-              {
-                heading: "Role Fit Summary",
-                subheading: query,
-                bullets: ["Tailored summary generated from chat context."],
-              },
-            ],
-          },
-          expBullets.length > 0
-            ? {
-                title: "Experience",
-                items: expBullets.map((b) => ({ heading: "Relevant Experience", bullets: [b] })),
-              }
-            : null,
-          projBullets.length > 0
-            ? {
-                title: "Projects",
-                items: projBullets.map((b) => ({ heading: "Relevant Project", bullets: [b] })),
-              }
-            : null,
-        ].filter(Boolean),
-      }
-      localStorage.setItem("adam_resume_draft", JSON.stringify(draft))
-    } catch {}
-  }
-
-  const closeModal = (id: string) => {
-    setModals(modals.filter((modal) => modal.id !== id))
-  }
-
-  // Speech: use Web Speech API when enabled
   useEffect(() => {
     if (!ENABLE_SPEECH) return
     const SpeechRecognitionImpl = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
@@ -303,296 +83,456 @@ export default function ChatPage() {
     rec.onend = () => setIsRecording(false)
     recognitionRef.current = rec
     return () => {
-      try { rec.stop() } catch {}
+      try { rec.stop() } catch { }
     }
   }, [])
 
-  async function toggleRecording() {
-    if (!ENABLE_SPEECH) return
-    const rec = recognitionRef.current
-    if (!rec) return
-    if (isRecording) {
-      try { rec.stop() } catch {}
-      setIsRecording(false)
-      return
-    }
+  // --- Functions ---
+  const saveHistory = (history: ConversationEntry[]) => {
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-      rec.start()
-      setIsRecording(true)
-    } catch (e) {
-      console.error("mic error", e)
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history))
+    } catch { }
+  }
+
+  const clearConversation = () => {
+    setConversationHistory([])
+    setModals([])
+    try {
+      sessionStorage.removeItem(STORAGE_KEY)
+    } catch { }
+  }
+
+  const getHistoryForAPI = (): string[] => {
+    return conversationHistory.map(entry => entry.content)
+  }
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) return
+    const userMessage = message
+    setIsTyping(true)
+    setMessage("")
+
+    const lensContext = LENS_CONTEXTS[activeLens]
+    const messageWithLens = lensContext ? `${lensContext}\n${userMessage}` : userMessage
+
+    const userEntry: ConversationEntry = {
+      role: 'user',
+      content: userMessage,
+      timestamp: Date.now()
+    }
+    const updatedHistory = [...conversationHistory, userEntry]
+    setConversationHistory(updatedHistory)
+
+    if (ENABLE_BAML) {
+      try {
+        const res = await fetch("/api/adam", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: messageWithLens,
+            history: getHistoryForAPI() // API receives all, UI filters display
+          }),
+        })
+        const data: AdamResponse = await res.json()
+        const mapped = mapAdamResponseToChatModals(data)
+
+        setModals(prev => [...mapped, ...prev])
+
+        const assistantSummary = mapped.map(m => m.title).join(', ')
+        // We track assistant messages for history context but will hide them in UI
+        const assistantEntry: ConversationEntry = {
+          role: 'assistant',
+          content: `Results: ${assistantSummary}`,
+          timestamp: Date.now()
+        }
+        const finalHistory = [...updatedHistory, assistantEntry]
+        setConversationHistory(finalHistory)
+        saveHistory(finalHistory)
+
+        if (ENABLE_SPEECH) speakModals(mapped)
+        if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(mapped, userMessage)
+      } catch (e) {
+        console.error("/api/adam error", e)
+      } finally {
+        setIsTyping(false)
+      }
+    } else {
+      setTimeout(() => {
+        generateModals(userMessage)
+        setIsTyping(false)
+      }, 1200)
     }
   }
 
+  const generateModals = (userMessage: string) => {
+    const newModals: ChatModal[] = []
+
+    if (userMessage.toLowerCase().includes("vision")) {
+      newModals.push({
+        id: Date.now() + "-1",
+        type: "experience",
+        title: "Computer Vision Experience",
+        content: {
+          role: "Computer Vision Engineer",
+          company: "Tech Corp",
+          duration: "2022 - Present",
+          description: "Developed advanced computer vision algorithms for robotic perception and autonomous navigation.",
+          technologies: ["OpenCV", "PyTorch", "YOLO", "ROS"],
+          images: ["/computer-vision-project.png"],
+          urls: [{ name: "Paper", icon: "newspaper", link: "#" }]
+        },
+        reasoning: "Matched 'vision' keyword."
+      })
+    }
+
+    // Summary Modal (Simplified)
+    newModals.push({
+      id: Date.now() + "-sum",
+      type: "summary",
+      // No Title for summary
+      content: {
+        description: "I've pulled up relevant experience in Computer Vision based on your request. Feel free to ask about specific projects."
+      },
+      // No Reasoning for summary
+    })
+
+    setModals(prev => [...newModals, ...prev])
+    if (ENABLE_SPEECH) speakModals(newModals)
+    if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
+  }
+
+  function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
+    return (resp.modals || []).map((m) => ({
+      id: m.id,
+      type: (m.type?.toLowerCase() as any) ?? "project",
+      title: m.title,
+      content: {
+        description: Array.isArray(m.body) ? m.body.join("\n") : m.body,
+        images: m.images || [],
+        downloadUrl: m.linkHref,
+        technologies: [], // Frontend expects tech to be populated if available
+        urls: m.linkHref ? [{ name: "Link", icon: "globe", link: m.linkHref }] : []
+      },
+      reasoning: m.reasoning,
+    }))
+  }
+
+  function speakModals(list: ChatModal[]) {
+    try {
+      const synth = window.speechSynthesis
+      if (!synth) return
+      const utter = new SpeechSynthesisUtterance("I've updated the deck with new information.")
+      synth.speak(utter)
+    } catch { }
+  }
+
+  function saveResumeDraft(list: ChatModal[], query: string) {
+    try {
+      const draft = {
+        name: "Adán Flores",
+        email: "adan@example.com",
+        phone: "+1 (408) 312-1647",
+        sections: [
+          {
+            title: "Summary",
+            items: [{ heading: "Role Fit Summary", subheading: query, bullets: ["Tailored summary."] }],
+          },
+        ].filter(Boolean),
+      }
+      localStorage.setItem("adam_resume_draft", JSON.stringify(draft))
+    } catch { }
+  }
+
+  const closeModal = (id: string) => {
+    setModals(prev => prev.filter(m => m.id !== id))
+  }
+
+  // --- Render ---
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative overflow-hidden">
-      {/* Background AI Character */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="relative w-96 h-96 md:w-[500px] md:h-[500px] opacity-30">
-          <Image src="/futuristic-ai-hologram.png" alt="AI Assistant Character" fill className="object-contain animate-pulse" />
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div className="flex flex-col md:flex-row h-screen w-full bg-[#050505] text-white overflow-hidden relative font-sans">
+
+      {/* --- GLOBAL BACKGROUND (Canvas) --- */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
+        <div className="relative w-[300px] h-[300px] md:w-[600px] md:h-[600px] opacity-20">
+          <Image
+            src="/images/adam.png"
+            alt="Adam AI"
+            fill
+            className="object-contain animate-pulse-slow drop-shadow-2xl"
+            priority
+          />
+          <div className="absolute inset-0 bg-blue-500/10 rounded-full blur-[100px] mix-blend-screen animate-pulse"></div>
         </div>
       </div>
 
-      {/* Chat Modals */}
-      {modals.map((modal, index) => (
-        <div
-          key={modal.id}
-          className="fixed z-20 animate-in fade-in slide-in-from-bottom-4 duration-500"
-          style={{
-            left: typeof window !== "undefined" && window.innerWidth > 768 ? `${modal.position.x + index * 350}px` : "10px",
-            top: typeof window !== "undefined" && window.innerWidth > 768 ? `${modal.position.y}px` : `${80 + index * 200}px`,
-            right: typeof window !== "undefined" && window.innerWidth <= 768 ? "10px" : "auto",
-          }}
+      {/* --- DESKTOP LEFT SIDEBAR (Expandable) --- */}
+      <div
+        className={`
+           order-2 md:order-1 
+           ${isSidebarOpen ? 'w-full md:w-80 lg:w-96' : 'w-full md:w-16'} 
+           bg-black/80 backdrop-blur-md border-t md:border-t-0 md:border-r border-white/5 
+           flex flex-col transition-all duration-300 relative z-50 shrink-0
+           h-[30vh] md:h-full
+         `}
+      >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="hidden md:flex absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-12 bg-black border border-white/10 rounded-full items-center justify-center text-white/50 hover:text-white z-50 shadow-xl"
         >
-          <div className="bg-[#1a1a1a]/95 backdrop-blur-md border border-purple-500/30 rounded-xl p-6 w-full md:w-80 lg:w-96 shadow-2xl max-h-[60vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">{modal.title}</h3>
-              <button onClick={() => closeModal(modal.id)} className="text-white/60 hover:text-white transition-colors">
-                <X size={18} />
-              </button>
-            </div>
+          {isSidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
 
-            {modal.type === "experience" && (
-              <div className="space-y-4">
-                {modal.content.images && modal.content.images.length > 0 && (
-                  <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.role || modal.title || "Experience image"} fill className="object-cover" />
-                  </div>
-                )}
-                <div>
-                  <h4 className="font-semibold text-white">{modal.content.role}</h4>
-                  <p className="text-purple-400">{modal.content.company}</p>
-                  <p className="text-white/60 text-sm">{modal.content.duration}</p>
-                </div>
-                <p className="text-white/80 text-sm">{modal.content.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {modal.content.technologies.map((tech: string, i: number) => (
-                    <span key={i} className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded text-xs">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {modal.type === "resume" && (
-              <div className="space-y-4">
-                <p className="text-white/80 text-sm">{modal.content.description}</p>
-                <p className="text-white/60 text-xs">Last updated: {modal.content.lastUpdated}</p>
-                <a
-                  href={modal.content.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <Download size={16} />
-                  Download Resume
-                </a>
-              </div>
-            )}
-
-            {modal.type === "project" && (
-              <div className="space-y-4">
-                {modal.content.images && modal.content.images.length > 0 && (
-                  <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.content.title || modal.title || "Project image"} fill className="object-cover" />
-                  </div>
-                )}
-                <div>
-                  <h4 className="font-semibold text-white">{modal.content.title}</h4>
-                  <p className="text-white/80 text-sm">{modal.content.description}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {modal.content.technologies.map((tech: string, i: number) => (
-                    <span key={i} className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-                {modal.content.demoUrl && (
-                  <a
-                    href={modal.content.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <ExternalLink size={16} />
-                    View Demo
-                  </a>
-                )}
-              </div>
-            )}
-
-            {modal.type === "summary" && (
-              <div className="space-y-4">
-                <p className="text-white/80 text-sm whitespace-pre-line">{modal.content.description}</p>
-              </div>
-            )}
-
-            {modal.type === "education" && (
-              <div className="space-y-4">
-                {modal.content.images && modal.content.images.length > 0 && (
-                  <div className="aspect-video relative rounded-lg overflow-hidden">
-                    <Image src={modal.content.images[0] || "/placeholder.svg"} alt={modal.title || "Education image"} fill className="object-cover" />
-                  </div>
-                )}
-                <p className="text-white/80 text-sm">{modal.content.description}</p>
-              </div>
-            )}
-
-            {/* AI Reasoning - Transparent AI */}
-            {modal.reasoning && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <p className="text-white/50 text-xs italic">
-                  <span className="text-purple-400/70">Why this was selected:</span> {modal.reasoning}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-
-      {/* Top Navigation */}
-      <div className="fixed top-6 left-6 right-6 z-30 flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20"
-        >
-          <ArrowLeft size={18} />
-          <span className="hidden sm:inline">Back</span>
-        </Link>
-
-        {conversationHistory.length > 0 && (
-          <button
-            onClick={clearConversation}
-            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20"
-          >
-            <RotateCcw size={18} />
-            <span className="hidden sm:inline">Clear Chat</span>
-          </button>
-        )}
-      </div>
-
-      {/* Chat Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 p-4 md:p-6">
-        <div className="max-w-4xl mx-auto">
-          {/* Conversation History Display */}
-          {conversationHistory.length > 0 && (
-            <div className="mb-4 max-h-32 overflow-y-auto space-y-2">
-              {conversationHistory.slice(-4).map((entry, i) => (
-                <div
-                  key={entry.timestamp}
-                  className={`p-2 rounded-lg text-sm ${
-                    entry.role === 'user'
-                      ? 'bg-[#1a1a1a]/80 border border-white/10'
-                      : 'bg-purple-600/20 border border-purple-500/20'
-                  }`}
-                >
-                  <span className="text-white/60">
-                    {entry.role === 'user' ? 'You: ' : 'Adam: '}
-                  </span>
-                  <span className="text-white/80">{entry.content}</span>
-                </div>
-              ))}
-            </div>
+        {/* Header / Nav */}
+        <div className={`p-4 flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center z-10`}>
+          <Link href="/" className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors">
+            <ArrowLeft size={20} />
+          </Link>
+          {isSidebarOpen && (
+            <h1 className="font-bold text-lg tracking-tight font-heading bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">ADAM AI</h1>
           )}
+        </div>
 
-          {/* Lens Selector */}
-          <div className="mb-3 flex flex-wrap gap-2 justify-center">
-            <span className="text-white/40 text-xs self-center mr-1">View as:</span>
-            {(Object.keys(LENS_LABELS) as LensType[]).map((lens) => (
-              <button
-                key={lens}
-                onClick={() => setActiveLens(lens)}
-                disabled={isTyping}
-                className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
-                  activeLens === lens
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
-                }`}
-              >
-                {LENS_LABELS[lens]}
-              </button>
+        {/* Chat History Area - USER MESSAGES ONLY */}
+        {isSidebarOpen && (
+          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 scrollbar-thin scrollbar-thumb-white/10 z-10 scroll-smooth">
+            {/* Welcome msg if empty */}
+            {conversationHistory.length === 0 && (
+              <div className="mt-10 text-center space-y-4 opacity-50">
+                <MessageSquare size={32} className="mx-auto text-blue-400" />
+                <p className="text-sm font-sans">Ask about my experience, skills, or specific projects to see how I fit your needs.</p>
+              </div>
+            )}
+
+            {conversationHistory.filter(e => e.role === 'user').map((entry, i) => (
+              <div key={entry.timestamp || i} className="flex justify-end">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-sm font-sans">
+                  {entry.content}
+                </div>
+              </div>
             ))}
+            <div ref={chatBottomRef}></div>
           </div>
+        )}
 
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="mb-4 p-3 bg-purple-600/20 backdrop-blur-md rounded-lg border border-purple-500/30">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+        {!isSidebarOpen && <div className="flex-1"></div>}
+
+        {/* Input Area */}
+        <div className="p-4 bg-black/50 border-t border-white/5 backdrop-blur z-10">
+          <div className={`flex ${isSidebarOpen ? 'flex-col' : 'flex-col items-center'} gap-3`}>
+            <div className="relative w-full">
+              <input
+                ref={inputRef}
+                type="text"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                placeholder={isSidebarOpen ? "Ask about projects..." : ""}
+                className={`
+                            bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-all font-sans
+                            ${isSidebarOpen ? 'w-full' : 'w-10 h-10 p-0 text-center cursor-pointer hover:border-white/30'}
+                        `}
+                onFocus={() => !isSidebarOpen && setIsSidebarOpen(true)}
+              />
+              {!isSidebarOpen && !message && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <MessageSquare size={16} className="text-white/40" />
                 </div>
-                <span className="text-purple-300 text-sm">AI is analyzing your request...</span>
+              )}
+            </div>
+
+            {isSidebarOpen && (
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <button className="text-xs text-white/40 hover:text-white flex items-center gap-1 font-sans" onClick={clearConversation}>
+                    <RotateCcw size={12} /> Clear
+                  </button>
+                </div>
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!message.trim()}
+                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-white/10 disabled:text-white/20 text-white p-2 rounded-lg transition-colors"
+                >
+                  <Send size={16} />
+                </button>
               </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* --- RIGHT PANEL: Masonry Content Deck --- */}
+      <div className="order-1 md:order-2 flex-1 h-[70vh] md:h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-white/10 p-4 md:p-8 z-10">
+        {/* Masonry Grid */}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 mx-auto max-w-7xl">
+
+          {/* Intro Card (if empty) */}
+          {modals.length === 0 && (
+            <div className="break-inside-avoid bg-[#1a1a1a]/80 backdrop-blur rounded-xl p-8 border border-white/5 text-center">
+              <Sparkles size={32} className="mx-auto text-yellow-500/50 mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2 font-heading">Knowledge Deck</h2>
+              <p className="text-white/50 text-sm font-sans">
+                I am a context-aware portfolio assistant. As we chat, relevant project cards, skills, and summaries will appear here in real-time.
+              </p>
             </div>
           )}
 
-           {/* Input Field */}
-           <div className="flex gap-2 items-center bg-[#1a1a1a]/90 backdrop-blur-md rounded-full border border-white/20 p-2">
-             {ENABLE_SPEECH && (
-               <button
-                 type="button"
-                 onClick={toggleRecording}
-                 className={`rounded-full p-2 ${isRecording ? "bg-red-600/70" : "bg-white/10 hover:bg-white/20"}`}
-                 aria-label="Toggle voice input"
-               >
-                 {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
-               </button>
-             )}
-            <input
-              ref={inputRef}
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              placeholder="Ask about my experience, request my resume, or inquire about projects..."
-              className="flex-1 bg-transparent text-white placeholder-white/50 px-4 py-2 focus:outline-none"
-              disabled={isTyping}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!message.trim() || isTyping}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 text-white p-2 rounded-full transition-all duration-300 disabled:cursor-not-allowed"
-            >
-              <Send size={18} />
-            </button>
-          </div>
+          {/* Modals / Cards */}
+          {modals.map((modal) => (
+            <div key={modal.id} className="break-inside-avoid animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <ContentCard modal={modal} onClose={() => closeModal(modal.id)} />
+            </div>
+          ))}
 
-           {/* Suggested Prompts */}
-          <div className="mt-4 flex flex-wrap gap-2 justify-center">
-            {["Show me your computer vision experience", "I need your resume", "Tell me about your robotics projects"].map(
-              (prompt, i) => (
-                <button
-                  key={i}
-                  onClick={() => setMessage(prompt)}
-                  className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-xs rounded-full transition-all duration-300"
-                  disabled={isTyping}
-                >
-                  {prompt}
-                </button>
-              )
-            )}
+          {/* Resume CTA (Static) */}
+          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 group cursor-pointer hover:shadow-2xl hover:shadow-purple-500/10 transition-all">
+            <div className="bg-[#151515]/90 backdrop-blur rounded-xl p-6 relative overflow-hidden h-full">
+              <div className="relative z-10 flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white font-heading">Custom Resume</h3>
+                  <p className="text-xs text-white/50 mt-1 font-sans">Generated from deck context</p>
+                </div>
+                <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
+                  <Download size={20} className="text-white" />
+                </div>
+              </div>
+            </div>
           </div>
-
-           {ENABLE_DYNAMIC_RESUME && (
-             <div className="mt-3 flex justify-center">
-               <Link
-                 href={`/resume/preview?from=adam`}
-                 className="text-xs text-white/70 hover:text-white underline"
-               >
-                 Preview AI-tailored resume from your last prompt
-               </Link>
-             </div>
-           )}
         </div>
+
+        <div className="h-20"></div>
       </div>
     </div>
   )
 }
 
+// --- Subcomponents ---
 
+function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void }) {
+  const isProj = modal.type === 'project'
+  const isSum = modal.type === 'summary'
+
+  // Icon mapping
+  const getIcon = (type: string) => {
+    if (type.includes('github')) return <Github size={14} />
+    if (type.includes('youtube')) return <Youtube size={14} />
+    if (type.includes('paper') || type.includes('pdf')) return <FileText size={14} />
+    return <Globe size={14} />
+  }
+
+  // SUMMARY CARD VARIANT
+  if (isSum) {
+    return (
+      <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-white/10 bg-gradient-to-br from-[#1a1a2e]/90 to-[#16213e]/90 backdrop-blur p-6">
+        <button onClick={onClose} className="absolute top-2 right-2 p-1.5 text-white/20 hover:text-white transition-all z-20">
+          <X size={12} />
+        </button>
+        <div className="flex items-start gap-4">
+          <div className="p-2 bg-blue-500/10 rounded-lg shrink-0">
+            <Sparkles size={16} className="text-blue-400" />
+          </div>
+          <p className="text-sm text-white/80 leading-relaxed font-sans font-md">
+            {modal.content.description}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // STANDARD CARD VARIANT
+  return (
+    <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-white/10 bg-[#1c1c1f]/90 backdrop-blur">
+
+      {/* Close Button */}
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white/50 hover:text-white rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 backdrop-blur"
+      >
+        <X size={12} />
+      </button>
+
+      {/* Image */}
+      {modal.content.images && modal.content.images.length > 0 && (
+        <div className="relative aspect-video w-full overflow-hidden">
+          <Image
+            src={modal.content.images[0]}
+            alt={modal.title || ""}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] to-transparent opacity-90"></div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="p-5 relative z-10">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-3">
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full font-heading ${isProj ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'
+            }`}>
+            {modal.type}
+          </span>
+        </div>
+
+        <h3 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-blue-400 transition-colors font-heading">{modal.title}</h3>
+
+        {modal.content.role && (
+          <p className="text-sm text-white/50 mb-2 font-medium font-sans">{modal.content.role} • {modal.content.company}</p>
+        )}
+
+        <p className="text-sm text-white/70 leading-relaxed mb-4 line-clamp-6 whitespace-pre-line font-sans">
+          {modal.content.description}
+        </p>
+
+        {/* Skills (Pills) */}
+        {modal.content.technologies && modal.content.technologies.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {modal.content.technologies.slice(0, 5).map((tech: string, i: number) => (
+              <span key={i} className="px-3 py-1 bg-[#2a2a2d] rounded-full text-xs text-white/70 hover:text-white transition-colors border border-white/5 font-sans">
+                {tech}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Links (Icons) */}
+        <div className="flex items-center gap-2 border-t border-white/5 pt-3 mt-2 empty:hidden">
+          {modal.content.urls && modal.content.urls.map((url: any, i: number) => (
+            <a
+              key={i}
+              href={url.link}
+              target="_blank"
+              rel="noreferrer"
+              className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-blue-600 hover:text-white rounded-full text-white/40 transition-all"
+              title={url.name}
+            >
+              {getIcon(url.icon)}
+            </a>
+          ))}
+
+          {modal.content.demoUrl && (
+            <a href={modal.content.demoUrl} className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-red-500 hover:text-white rounded-full text-white/40 transition-all" title="Demo">
+              <Youtube size={14} />
+            </a>
+          )}
+
+          {modal.content.downloadUrl && (
+            <a href={modal.content.downloadUrl} className="ml-auto flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 transition-colors font-sans">
+              Download PDF <Download size={12} />
+            </a>
+          )}
+        </div>
+
+        {/* Reasoning Footer (Except for Summary) */}
+        {!isSum && modal.reasoning && (
+          <div className="mt-3 pt-2 border-t border-white/5">
+            <p className="text-[10px] text-white/30 italic flex items-start gap-1 font-sans">
+              <span className="text-blue-500/50">Reasoning:</span> {modal.reasoning}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
