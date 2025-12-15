@@ -186,7 +186,8 @@ export async function POST(req: Request) {
             `Technologies: ${proj.technologies}\n` +
             `Industry: ${proj.industry}\n` +
             `Date: ${proj.date}\n` +
-            `Images: ${proj.details?.images?.join(', ') || 'none'}\n`
+            `Images: ${proj.details?.images?.join(', ') || 'none'}\n` +
+            `URLs: ${proj.urls?.map(url => url.name).join(', ')}\n`
           ).join('\n---\n')
 
         console.log("📊 Context prepared - Experiences:", experiences.length, "Projects:", projects.length)
