@@ -22,15 +22,11 @@ export default function AboutSection() {
 
             <div className="space-y-4 text-gray-700">
               <p>
-                Proficient and thorough engineer with experience in software engineering and robotics, always eager to
-                learn and self-driven towards building <i>A Society We Deserve</i>. I develop software for robotics, backend, artificial intelligence and automation applications. I do
-                research in AI for Robotics.
+              Proficient and thorough engineer bridging academia and industry in Robotics research.
+              I lead teams, build assistive robotics platforms, and develop AI systems that work without expensive infrastructure.
+              Driven to bring first-world innovation back home: making technology accessible, beneficial, and transformative for communities often overlooked.
               </p>
-              <p>
-                With several years in internships, international robotics and programming competitions as well as
-                learning courses and personal projects, I have gained outstanding skills in problem solving, research
-                and leadership.
-              </p>
+              
             </div>
 
             <div className="mt-8">

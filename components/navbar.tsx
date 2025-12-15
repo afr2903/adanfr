@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Menu, X, FileText, BookOpen, Linkedin, Github, MessageCircle } from "lucide-react"
+import { Menu, X, FileText, Linkedin, Github, MessageCircle, GraduationCap } from "lucide-react"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -175,7 +175,7 @@ export default function Navbar() {
             className="text-white/70 hover:text-primary transition-colors"
             aria-label="Google Scholar"
           >
-            <BookOpen size={20} />
+            <GraduationCap size={20} />
           </a>
         </div>
 
@@ -298,7 +298,7 @@ export default function Navbar() {
                 className="text-white/70 hover:text-primary transition-colors"
                 aria-label="Google Scholar"
               >
-                <BookOpen size={20} />
+                <GraduationCap size={20} />
               </a>
             </div>
           </nav>

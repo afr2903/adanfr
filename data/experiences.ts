@@ -1,10 +1,28 @@
 export const experiences = [
   {
+    id: "stealth",
+    logo: "/images/logos/stealth.jpeg",
+    company: "Stealth Startup",
+    role: "Founding Engineer",
+    period: "Aug. 2025 - Present",
+    description: "110k USD raised so far at a 4M valuation. 8k MRR. ",
+    details: {
+      description: [
+        "Building voice and text agents for restaurants to take and manage orders, within their own difussion channels.",
+      ],
+      organization: "Stealth Startup",
+      period: "July. 2025 - Present",
+      location: "Remote",
+      skills: ["Python", "LiveKit", "FastAPI", "BAML"],
+      images: [],
+    },
+  },
+  {
     id: "pefai",
     logo: "/images/logos/pefai.jpg",
     company: "Pefai",
     role: "AI Engineer",
-    period: "Jan. 2025 - Present",
+    period: "Jan. 2025 - Sep. 2025",
     description: "Designing and building AI agent microservice",
     details: {
       description: [
@@ -14,7 +32,7 @@ export const experiences = [
       period: "Jan. 2025 - Present",
       location: "Remote",
       skills: ["Python", "Autogen", "FastAPI", "BAML", "GO", "Kotlin"],
-      images: [],
+      images: ["/images/experiences/pefai-1.jpg"],
     },
   },
   {

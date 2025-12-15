@@ -64,7 +64,7 @@ export default function Footer() {
 
         <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600 text-sm mb-4 md:mb-0">
-            Last updated: 11/08/2025
+            Last updated: 19/10/2025
           </p>
 
           <nav className="flex gap-6">

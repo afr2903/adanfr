@@ -36,7 +36,7 @@ export default function PortfolioSection() {
 
         <div className="flex justify-center mb-12">
           <div className="flex flex-wrap gap-4 justify-center">
-            {["All", "Robotics", "Software", "Mechatronics"].map((filter) => (
+            {["All", "Research", "Competitions", "Undergraduate"].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
@@ -208,6 +208,7 @@ export default function PortfolioSection() {
                           {url.icon.includes("youtube") && <Youtube size={18} />}
                           {url.icon.includes("github") && <Github size={18} />}
                           {url.icon.includes("newspaper") && <FileText size={18} />}
+                          {url.icon.includes("file") && <FileText size={18} />}
                           {url.name}
                           <ExternalLink size={14} />
                         </a>
