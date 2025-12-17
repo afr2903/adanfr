@@ -592,7 +592,7 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
         )}
 
         {/* Description */}
-        <p className="text-sm text-white/70 leading-relaxed mb-4 line-clamp-5 whitespace-pre-line">
+        <p className="text-sm text-white/70 leading-relaxed mb-4 whitespace-pre-line">
           {modal.content.description}
         </p>
 
@@ -647,10 +647,9 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-xs text-white/50 transition-all"
-                  title={url.name}
                 >
                   {getUrlIcon(url.icon, url.name)}
-                  <span className="max-w-[100px] truncate">{url.name || 'Link'}</span>
+                  <span>{url.name || 'Link'}</span>
                 </a>
               ))}
             </div>
