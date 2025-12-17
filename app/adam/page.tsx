@@ -7,6 +7,13 @@ import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
 import type { AdamResponse, LensType } from "@/lib/adam-types"
 import { LENS_CONTEXTS } from "@/lib/adam-types"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 // --- Types ---
 
@@ -265,7 +272,7 @@ export default function ChatPage() {
   // --- Render ---
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-full bg-[#0a0a0a] text-white overflow-hidden relative" style={{ fontFamily: 'var(--font-figtree), ui-sans-serif, system-ui' }}>
+    <div className="flex flex-col md:flex-row h-[100dvh] w-full bg-[#0a0a0a] text-white overflow-hidden relative" style={{ fontFamily: 'var(--font-figtree), ui-sans-serif, system-ui' }}>
 
       {/* --- GLOBAL BACKGROUND (Canvas) --- */}
       <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
@@ -289,7 +296,7 @@ export default function ChatPage() {
            ${isSidebarOpen ? 'w-full md:w-80 lg:w-96' : 'w-full md:w-16'}
            bg-[#121212]/95 backdrop-blur-md border-t md:border-t-0 md:border-r border-white/5
            flex flex-col transition-all duration-300 relative z-50 shrink-0
-           h-[30vh] md:h-full
+           h-[40vh] md:h-full
          `}
       >
         {/* Toggle Button */}
@@ -324,23 +331,26 @@ export default function ChatPage() {
         {isSidebarOpen && (
           <div className="px-4 pb-3 z-10">
             <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2" style={{ fontFamily: 'var(--font-dm-sans)' }}>View as</p>
-            <div className="flex flex-wrap gap-1.5">
-              {(Object.keys(LENS_LABELS) as LensType[]).map((lens) => (
-                <button
-                  key={lens}
-                  onClick={() => setActiveLens(lens)}
-                  className={`
-                    flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs transition-all
-                    ${activeLens === lens
-                      ? 'bg-primary/20 text-primary border border-primary/30'
-                      : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 border border-transparent'}
-                  `}
-                >
-                  {LENS_ICONS[lens]}
-                  {LENS_LABELS[lens]}
-                </button>
-              ))}
-            </div>
+            <Select value={activeLens} onValueChange={(v) => setActiveLens(v as LensType)}>
+              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 transition-colors h-9">
+                <SelectValue placeholder="Select Persona">
+                  <div className="flex items-center gap-2">
+                    {LENS_ICONS[activeLens]}
+                    <span>{LENS_LABELS[activeLens]}</span>
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
+                {(Object.keys(LENS_LABELS) as LensType[]).map((lens) => (
+                  <SelectItem key={lens} value={lens} className="focus:bg-white/10 focus:text-white cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      {LENS_ICONS[lens as LensType]}
+                      <span>{LENS_LABELS[lens as LensType]}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -413,7 +423,7 @@ export default function ChatPage() {
       </div>
 
       {/* --- RIGHT PANEL: Masonry Content Deck --- */}
-      <div className="order-1 md:order-2 flex-1 h-[70vh] md:h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-white/10 p-4 md:p-8 z-10">
+      <div className="order-1 md:order-2 flex-1 min-h-0 overflow-y-auto relative scrollbar-thin scrollbar-thumb-white/10 p-4 md:p-8 z-10">
         {/* Masonry Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5 mx-auto max-w-7xl">
 
