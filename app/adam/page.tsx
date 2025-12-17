@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight, Building2, Calendar, Briefcase, GraduationCap, User, Users, Search, Lightbulb, Link as LinkIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
@@ -24,6 +24,14 @@ const LENS_LABELS: Record<LensType, string> = {
   collaborator: 'Collaborator',
   researcher: 'Researcher',
   founder: 'Founder'
+}
+
+const LENS_ICONS: Record<LensType, React.ReactNode> = {
+  none: <Sparkles size={14} />,
+  recruiter: <Briefcase size={14} />,
+  collaborator: <Users size={14} />,
+  researcher: <Search size={14} />,
+  founder: <Lightbulb size={14} />
 }
 
 interface ConversationEntry {
@@ -202,16 +210,23 @@ export default function ChatPage() {
   }
 
   function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
-    return (resp.modals || []).map((m) => ({
+    return (resp.modals || []).map((m: any) => ({
       id: m.id,
       type: (m.type?.toLowerCase() as any) ?? "project",
       title: m.title,
       content: {
-        description: Array.isArray(m.body) ? m.body.join("\n") : m.body,
+        description: Array.isArray(m.body) ? m.body.join("\n\n") : m.body,
         images: m.images || [],
         downloadUrl: m.linkHref,
-        technologies: [], // Frontend expects tech to be populated if available
-        urls: m.linkHref ? [{ name: "Link", icon: "globe", link: m.linkHref }] : []
+        // Enhanced data fields
+        technologies: m.technologies || [],
+        client: m.client || null,
+        industry: m.industry || null,
+        date: m.date || null,
+        role: m.role || null,
+        company: m.company || null,
+        // URLs with proper structure
+        urls: m.urls || (m.linkHref ? [{ name: m.linkLabel || "Link", icon: "globe", link: m.linkHref }] : [])
       },
       reasoning: m.reasoning,
     }))
@@ -250,28 +265,29 @@ export default function ChatPage() {
   // --- Render ---
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-full bg-[#050505] text-white overflow-hidden relative font-sans">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-[#0a0a0a] text-white overflow-hidden relative" style={{ fontFamily: 'var(--font-figtree), ui-sans-serif, system-ui' }}>
 
       {/* --- GLOBAL BACKGROUND (Canvas) --- */}
       <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
-        <div className="relative w-[300px] h-[300px] md:w-[600px] md:h-[600px] opacity-20">
+        <div className="relative w-[300px] h-[300px] md:w-[600px] md:h-[600px] opacity-15">
           <Image
             src="/images/adam.png"
             alt="Adam AI"
             fill
-            className="object-contain animate-pulse-slow drop-shadow-2xl"
+            className="object-contain drop-shadow-2xl"
+            style={{ animation: 'pulse 4s ease-in-out infinite' }}
             priority
           />
-          <div className="absolute inset-0 bg-blue-500/10 rounded-full blur-[100px] mix-blend-screen animate-pulse"></div>
+          <div className="absolute inset-0 bg-primary/10 rounded-full blur-[120px] mix-blend-screen"></div>
         </div>
       </div>
 
       {/* --- DESKTOP LEFT SIDEBAR (Expandable) --- */}
       <div
         className={`
-           order-2 md:order-1 
-           ${isSidebarOpen ? 'w-full md:w-80 lg:w-96' : 'w-full md:w-16'} 
-           bg-black/80 backdrop-blur-md border-t md:border-t-0 md:border-r border-white/5 
+           order-2 md:order-1
+           ${isSidebarOpen ? 'w-full md:w-80 lg:w-96' : 'w-full md:w-16'}
+           bg-[#121212]/95 backdrop-blur-md border-t md:border-t-0 md:border-r border-white/5
            flex flex-col transition-all duration-300 relative z-50 shrink-0
            h-[30vh] md:h-full
          `}
@@ -279,7 +295,7 @@ export default function ChatPage() {
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="hidden md:flex absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-12 bg-black border border-white/10 rounded-full items-center justify-center text-white/50 hover:text-white z-50 shadow-xl"
+          className="hidden md:flex absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-12 bg-[#1a1a1a] border border-white/10 rounded-full items-center justify-center text-white/50 hover:text-white z-50 shadow-xl"
         >
           {isSidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
         </button>
@@ -290,9 +306,43 @@ export default function ChatPage() {
             <ArrowLeft size={20} />
           </Link>
           {isSidebarOpen && (
-            <h1 className="font-bold text-lg tracking-tight font-heading bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">ADAM AI</h1>
+            <div className="flex items-center gap-2">
+              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-primary/30">
+                <Image
+                  src="/images/adam.png"
+                  alt="Adam"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="font-semibold text-sm text-white/80" style={{ fontFamily: 'var(--font-dm-sans)' }}>Adam</span>
+            </div>
           )}
         </div>
+
+        {/* Persona Selector */}
+        {isSidebarOpen && (
+          <div className="px-4 pb-3 z-10">
+            <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2" style={{ fontFamily: 'var(--font-dm-sans)' }}>View as</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(Object.keys(LENS_LABELS) as LensType[]).map((lens) => (
+                <button
+                  key={lens}
+                  onClick={() => setActiveLens(lens)}
+                  className={`
+                    flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs transition-all
+                    ${activeLens === lens
+                      ? 'bg-primary/20 text-primary border border-primary/30'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 border border-transparent'}
+                  `}
+                >
+                  {LENS_ICONS[lens]}
+                  {LENS_LABELS[lens]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Chat History Area - USER MESSAGES ONLY */}
         {isSidebarOpen && (
@@ -300,14 +350,14 @@ export default function ChatPage() {
             {/* Welcome msg if empty */}
             {conversationHistory.length === 0 && (
               <div className="mt-10 text-center space-y-4 opacity-50">
-                <MessageSquare size={32} className="mx-auto text-blue-400" />
-                <p className="text-sm font-sans">Ask about my experience, skills, or specific projects to see how I fit your needs.</p>
+                <MessageSquare size={32} className="mx-auto text-primary" />
+                <p className="text-sm">Ask about my experience, skills, or specific projects to see how I fit your needs.</p>
               </div>
             )}
 
             {conversationHistory.filter(e => e.role === 'user').map((entry, i) => (
               <div key={entry.timestamp || i} className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-sm font-sans">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/15 border border-primary/20 text-white rounded-tr-sm">
                   {entry.content}
                 </div>
               </div>
@@ -319,7 +369,7 @@ export default function ChatPage() {
         {!isSidebarOpen && <div className="flex-1"></div>}
 
         {/* Input Area */}
-        <div className="p-4 bg-black/50 border-t border-white/5 backdrop-blur z-10">
+        <div className="p-4 bg-[#0f0f0f]/80 border-t border-white/5 backdrop-blur z-10">
           <div className={`flex ${isSidebarOpen ? 'flex-col' : 'flex-col items-center'} gap-3`}>
             <div className="relative w-full">
               <input
@@ -330,7 +380,7 @@ export default function ChatPage() {
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                 placeholder={isSidebarOpen ? "Ask about projects..." : ""}
                 className={`
-                            bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-all font-sans
+                            bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-all
                             ${isSidebarOpen ? 'w-full' : 'w-10 h-10 p-0 text-center cursor-pointer hover:border-white/30'}
                         `}
                 onFocus={() => !isSidebarOpen && setIsSidebarOpen(true)}
@@ -345,14 +395,14 @@ export default function ChatPage() {
             {isSidebarOpen && (
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
-                  <button className="text-xs text-white/40 hover:text-white flex items-center gap-1 font-sans" onClick={clearConversation}>
+                  <button className="text-xs text-white/40 hover:text-white flex items-center gap-1" onClick={clearConversation}>
                     <RotateCcw size={12} /> Clear
                   </button>
                 </div>
                 <button
                   onClick={handleSendMessage}
                   disabled={!message.trim()}
-                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-white/10 disabled:text-white/20 text-white p-2 rounded-lg transition-colors"
+                  className="bg-primary hover:bg-primary/80 disabled:bg-white/10 disabled:text-white/20 text-white p-2 rounded-xl transition-colors"
                 >
                   <Send size={16} />
                 </button>
@@ -365,14 +415,14 @@ export default function ChatPage() {
       {/* --- RIGHT PANEL: Masonry Content Deck --- */}
       <div className="order-1 md:order-2 flex-1 h-[70vh] md:h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-white/10 p-4 md:p-8 z-10">
         {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 mx-auto max-w-7xl">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5 mx-auto max-w-7xl">
 
           {/* Intro Card (if empty) */}
           {modals.length === 0 && (
-            <div className="break-inside-avoid bg-[#1a1a1a]/80 backdrop-blur rounded-xl p-8 border border-white/5 text-center">
-              <Sparkles size={32} className="mx-auto text-yellow-500/50 mb-4" />
-              <h2 className="text-xl font-bold text-white mb-2 font-heading">Knowledge Deck</h2>
-              <p className="text-white/50 text-sm font-sans">
+            <div className="break-inside-avoid bg-[#1a1a1a]/90 backdrop-blur rounded-xl p-8 border border-white/5 text-center">
+              <Sparkles size={32} className="mx-auto text-primary/50 mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-dm-sans)' }}>Knowledge Deck</h2>
+              <p className="text-white/50 text-sm">
                 I am a context-aware portfolio assistant. As we chat, relevant project cards, skills, and summaries will appear here in real-time.
               </p>
             </div>
@@ -386,14 +436,14 @@ export default function ChatPage() {
           ))}
 
           {/* Resume CTA (Static) */}
-          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 group cursor-pointer hover:shadow-2xl hover:shadow-purple-500/10 transition-all">
-            <div className="bg-[#151515]/90 backdrop-blur rounded-xl p-6 relative overflow-hidden h-full">
+          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 group cursor-pointer hover:shadow-2xl hover:shadow-primary/10 transition-all">
+            <div className="bg-[#151515]/95 backdrop-blur rounded-xl p-6 relative overflow-hidden h-full">
               <div className="relative z-10 flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-bold text-white font-heading">Custom Resume</h3>
-                  <p className="text-xs text-white/50 mt-1 font-sans">Generated from deck context</p>
+                  <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
+                  <p className="text-xs text-white/50 mt-1">Generated from deck context</p>
                 </div>
-                <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
+                <div className="p-3 bg-white/5 rounded-full group-hover:bg-primary/20 transition-colors">
                   <Download size={20} className="text-white" />
                 </div>
               </div>
@@ -409,30 +459,43 @@ export default function ChatPage() {
 
 // --- Subcomponents ---
 
-function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void }) {
-  const isProj = modal.type === 'project'
-  const isSum = modal.type === 'summary'
+// Type badge colors
+const TYPE_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+  project: { bg: 'bg-blue-500/10', text: 'text-blue-400', icon: <Briefcase size={10} /> },
+  experience: { bg: 'bg-purple-500/10', text: 'text-purple-400', icon: <Building2 size={10} /> },
+  education: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: <GraduationCap size={10} /> },
+  resume: { bg: 'bg-amber-500/10', text: 'text-amber-400', icon: <FileText size={10} /> },
+  summary: { bg: 'bg-primary/10', text: 'text-primary', icon: <Sparkles size={10} /> },
+}
 
-  // Icon mapping
-  const getIcon = (type: string) => {
-    if (type.includes('github')) return <Github size={14} />
-    if (type.includes('youtube')) return <Youtube size={14} />
-    if (type.includes('paper') || type.includes('pdf')) return <FileText size={14} />
+function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void }) {
+  const isSum = modal.type === 'summary'
+  const isResume = modal.type === 'resume'
+  const typeStyle = TYPE_STYLES[modal.type] || TYPE_STYLES.project
+
+  // Icon mapping for URLs
+  const getUrlIcon = (iconStr: string, name: string) => {
+    const lowerIcon = (iconStr || '').toLowerCase()
+    const lowerName = (name || '').toLowerCase()
+    if (lowerIcon.includes('github') || lowerName.includes('github')) return <Github size={14} />
+    if (lowerIcon.includes('youtube') || lowerName.includes('youtube') || lowerName.includes('video') || lowerName.includes('demo')) return <Youtube size={14} />
+    if (lowerIcon.includes('paper') || lowerIcon.includes('file') || lowerIcon.includes('newspaper') || lowerName.includes('paper') || lowerName.includes('publication') || lowerName.includes('report')) return <FileText size={14} />
+    if (lowerIcon.includes('slide') || lowerName.includes('presentation') || lowerName.includes('slide')) return <FileText size={14} />
     return <Globe size={14} />
   }
 
   // SUMMARY CARD VARIANT
   if (isSum) {
     return (
-      <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-white/10 bg-gradient-to-br from-[#1a1a2e]/90 to-[#16213e]/90 backdrop-blur p-6">
+      <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-primary/20 bg-gradient-to-br from-[#1a1a2e]/90 to-[#16213e]/90 backdrop-blur p-5">
         <button onClick={onClose} className="absolute top-2 right-2 p-1.5 text-white/20 hover:text-white transition-all z-20">
           <X size={12} />
         </button>
-        <div className="flex items-start gap-4">
-          <div className="p-2 bg-blue-500/10 rounded-lg shrink-0">
-            <Sparkles size={16} className="text-blue-400" />
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-primary/10 rounded-xl shrink-0">
+            <Sparkles size={16} className="text-primary" />
           </div>
-          <p className="text-sm text-white/80 leading-relaxed font-sans font-md">
+          <p className="text-sm text-white/80 leading-relaxed">
             {modal.content.description}
           </p>
         </div>
@@ -440,9 +503,44 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
     )
   }
 
-  // STANDARD CARD VARIANT
+  // RESUME CARD VARIANT
+  if (isResume) {
+    return (
+      <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-primary/20 bg-[#1c1c1f]/95 backdrop-blur">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white/50 hover:text-white rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 backdrop-blur"
+        >
+          <X size={12} />
+        </button>
+        <div className="p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded ${typeStyle.bg} ${typeStyle.text}`} style={{ fontFamily: 'var(--font-dm-sans)' }}>
+              {typeStyle.icon}
+              {modal.type}
+            </span>
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-dm-sans)' }}>{modal.title}</h3>
+          <p className="text-sm text-white/60 mb-4">{modal.content.description}</p>
+          {modal.content.downloadUrl && (
+            <a
+              href={modal.content.downloadUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-white text-sm rounded-xl transition-colors"
+            >
+              <Download size={14} />
+              Download Resume
+            </a>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // STANDARD CARD VARIANT (Project, Experience, Education)
   return (
-    <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-white/10 bg-[#1c1c1f]/90 backdrop-blur">
+    <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-white/10 bg-[#1c1c1f]/95 backdrop-blur">
 
       {/* Close Button */}
       <button
@@ -461,74 +559,115 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] to-transparent opacity-90"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
         </div>
       )}
 
       {/* Content */}
       <div className="p-5 relative z-10">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-3">
-          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full font-heading ${isProj ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'
-            }`}>
+        {/* Type Badge */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded ${typeStyle.bg} ${typeStyle.text}`} style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {typeStyle.icon}
             {modal.type}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-blue-400 transition-colors font-heading">{modal.title}</h3>
+        {/* Title */}
+        <h3 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-dm-sans)' }}>{modal.title}</h3>
 
+        {/* Role/Company for Experience */}
         {modal.content.role && (
-          <p className="text-sm text-white/50 mb-2 font-medium font-sans">{modal.content.role} • {modal.content.company}</p>
+          <p className="text-sm text-white/50 mb-2 font-medium">{modal.content.role} {modal.content.company && `• ${modal.content.company}`}</p>
         )}
 
-        <p className="text-sm text-white/70 leading-relaxed mb-4 line-clamp-6 whitespace-pre-line font-sans">
+        {/* Description */}
+        <p className="text-sm text-white/70 leading-relaxed mb-4 line-clamp-5 whitespace-pre-line">
           {modal.content.description}
         </p>
 
-        {/* Skills (Pills) */}
-        {modal.content.technologies && modal.content.technologies.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {modal.content.technologies.slice(0, 5).map((tech: string, i: number) => (
-              <span key={i} className="px-3 py-1 bg-[#2a2a2d] rounded-full text-xs text-white/70 hover:text-white transition-colors border border-white/5 font-sans">
-                {tech}
-              </span>
-            ))}
+        {/* Details Section (Client, Industry, Date) */}
+        {(modal.content.client || modal.content.industry || modal.content.date) && (
+          <div className="mb-4 space-y-1.5 text-xs text-white/50">
+            {modal.content.client && (
+              <div className="flex items-center gap-2">
+                <Building2 size={12} className="text-white/30" />
+                <span>{modal.content.client}</span>
+              </div>
+            )}
+            {modal.content.industry && (
+              <div className="flex items-center gap-2">
+                <Briefcase size={12} className="text-white/30" />
+                <span>{modal.content.industry}</span>
+              </div>
+            )}
+            {modal.content.date && (
+              <div className="flex items-center gap-2">
+                <Calendar size={12} className="text-white/30" />
+                <span>{modal.content.date}</span>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Links (Icons) */}
-        <div className="flex items-center gap-2 border-t border-white/5 pt-3 mt-2 empty:hidden">
-          {modal.content.urls && modal.content.urls.map((url: any, i: number) => (
+        {/* Technologies (Pills) */}
+        {modal.content.technologies && modal.content.technologies.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {modal.content.technologies.slice(0, 6).map((tech: string, i: number) => (
+              <span key={i} className="px-2.5 py-1 bg-[#252525] rounded text-[11px] text-white/60 hover:text-white hover:bg-[#333] transition-colors border border-white/5">
+                {tech}
+              </span>
+            ))}
+            {modal.content.technologies.length > 6 && (
+              <span className="px-2.5 py-1 bg-[#252525] rounded text-[11px] text-white/40 border border-white/5">
+                +{modal.content.technologies.length - 6}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Links Section */}
+        {modal.content.urls && modal.content.urls.length > 0 && (
+          <div className="border-t border-white/5 pt-3 mt-2">
+            <div className="flex flex-wrap gap-2">
+              {modal.content.urls.map((url: any, i: number) => (
+                <a
+                  key={i}
+                  href={url.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-xs text-white/50 transition-all"
+                  title={url.name}
+                >
+                  {getUrlIcon(url.icon, url.name)}
+                  <span className="max-w-[100px] truncate">{url.name || 'Link'}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Download URL (for resume type or if present) */}
+        {modal.content.downloadUrl && !modal.content.urls && (
+          <div className="border-t border-white/5 pt-3 mt-2">
             <a
-              key={i}
-              href={url.link}
+              href={modal.content.downloadUrl}
               target="_blank"
               rel="noreferrer"
-              className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-blue-600 hover:text-white rounded-full text-white/40 transition-all"
-              title={url.name}
+              className="inline-flex items-center gap-2 text-xs text-primary hover:text-primary/80 transition-colors"
             >
-              {getIcon(url.icon)}
+              <Download size={12} />
+              Download PDF
             </a>
-          ))}
+          </div>
+        )}
 
-          {modal.content.demoUrl && (
-            <a href={modal.content.demoUrl} className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-red-500 hover:text-white rounded-full text-white/40 transition-all" title="Demo">
-              <Youtube size={14} />
-            </a>
-          )}
-
-          {modal.content.downloadUrl && (
-            <a href={modal.content.downloadUrl} className="ml-auto flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 transition-colors font-sans">
-              Download PDF <Download size={12} />
-            </a>
-          )}
-        </div>
-
-        {/* Reasoning Footer (Except for Summary) */}
-        {!isSum && modal.reasoning && (
+        {/* Reasoning Footer */}
+        {modal.reasoning && (
           <div className="mt-3 pt-2 border-t border-white/5">
-            <p className="text-[10px] text-white/30 italic flex items-start gap-1 font-sans">
-              <span className="text-blue-500/50">Reasoning:</span> {modal.reasoning}
+            <p className="text-[10px] text-white/30 italic leading-relaxed">
+              <span className="text-primary/50 font-medium not-italic">Why this was selected:</span>{' '}
+              {modal.reasoning}
             </p>
           </div>
         )}
