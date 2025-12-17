@@ -1,7 +1,6 @@
 // BAML file for generating portfolio chat modals (Adam chat assistant)
 
 enum AdamModalType {
-  Resume
   Experience
   Project
   Education
@@ -13,11 +12,11 @@ class AdamModal {
   type AdamModalType @description("Type of modal to display")
   title string @description("Title/headline for the modal card")
   body string[] @description("Array of description paragraphs or bullet points")
-  reasoning string | null @description("Brief explanation of why this modal was selected for the query - be specific about the connection")
-  images string[] | null @description("Optional array of image URLs to display")
-  linkHref string | null @description("Optional link URL (e.g., for resume PDF)")
-  linkLabel string | null @description("Optional label for the link button")
-  sourceIds string[] | null @description("Optional IDs of source data items")
+  reasoning string? @description("Brief explanation of why this modal was selected for the query - be specific about the connection")
+  images string[]? @description("Optional array of image URLs to display")
+  linkHref string? @description("Optional link URL (e.g., for resume PDF)")
+  linkLabel string? @description("Optional label for the link button")
+  sourceIds string[]? @description("Optional IDs of source data items")
 }
 
 class AdamResponse {
@@ -54,26 +53,13 @@ function GenerateAdamModals(
     INSTRUCTIONS:
     1. Analyze the user's request and identify the most relevant experiences and/or projects
     2. Generate 2-4 modal cards that best answer their query (aim for 3-4 when possible)
-    3. ALWAYS include a resume modal as one of the cards (type: "resume")
-    4. For experience/project modals:
+    3. For experience/project modals:
        - Use the actual data from the context above
        - Extract the id, title/role, description
        - Include image URLs if available in the data
        - Create concise, engaging descriptions (2-4 bullet points max)
-    5. Order modals by relevance to the user's query
-    6. If the query is vague, include a summary modal explaining how Adán matches their needs
-
-    RESUME MODAL FORMAT:
-    {
-      "id": "resume",
-      "type": "Resume",
-      "title": "Download Resume (PDF)",
-      "body": ["Complete professional resume with all experience, education, and skills. Tailored for {{ user_message }}."],
-      "linkHref": "/Adan_Flores_resume.pdf",
-      "linkLabel": "Download Resume",
-      "images": null,
-      "sourceIds": null
-    }
+    4. Order modals by relevance to the user's query
+    5. MOST OF THE TIME INCLUDE a summary modal. Specially If the query includes a specific question or request, include a summary modal explaining how Adán matches their needs
 
     EXPERIENCE MODAL EXAMPLE:
     {

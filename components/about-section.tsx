@@ -11,7 +11,7 @@ export default function AboutSection() {
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3 flex justify-center">
             <div className="relative w-64 h-64 rounded-lg overflow-hidden">
-              <Image src="/images/pf-grad.png" alt="Adán Flores" fill className="object-cover" />
+              <Image src="/images/pf-grad.jpg" alt="Adán Flores" fill className="object-cover" />
             </div>
           </div>
 
