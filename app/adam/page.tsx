@@ -451,7 +451,7 @@ export default function ChatPage() {
               <div className="relative z-10 flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
-                  <p className="text-xs text-white/50 mt-1">Generated from deck context</p>
+                  <p className="text-xs text-white/50 mt-1">(COMING SOON) Generated from deck context</p>
                 </div>
                 <div className="p-3 bg-white/5 rounded-full group-hover:bg-primary/20 transition-colors">
                   <Download size={20} className="text-white" />
@@ -508,41 +508,6 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
           <p className="text-sm text-white/80 leading-relaxed">
             {modal.content.description}
           </p>
-        </div>
-      </div>
-    )
-  }
-
-  // RESUME CARD VARIANT
-  if (isResume) {
-    return (
-      <div className="group relative rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/5 hover:border-primary/20 bg-[#1c1c1f]/95 backdrop-blur">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white/50 hover:text-white rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 backdrop-blur"
-        >
-          <X size={12} />
-        </button>
-        <div className="p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded ${typeStyle.bg} ${typeStyle.text}`} style={{ fontFamily: 'var(--font-dm-sans)' }}>
-              {typeStyle.icon}
-              {modal.type}
-            </span>
-          </div>
-          <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-dm-sans)' }}>{modal.title}</h3>
-          <p className="text-sm text-white/60 mb-4">{modal.content.description}</p>
-          {modal.content.downloadUrl && (
-            <a
-              href={modal.content.downloadUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-white text-sm rounded-xl transition-colors"
-            >
-              <Download size={14} />
-              Download Resume
-            </a>
-          )}
         </div>
       </div>
     )
