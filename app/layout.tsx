@@ -24,7 +24,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Adán Flores | Robotics & AI Engineer",
   description:
-    "Personal portfolio of Adán Flores, a Robotics and AI Engineer specializing in research and development.",
+    "Personal portfolio of Adán Flores, a Research Engineer specializing in human-computer interaction.",
     generator: 'v0.dev'
 }
 

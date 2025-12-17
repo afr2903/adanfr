@@ -1,4 +1,4 @@
-export type AdamModalType = "resume" | "experience" | "project" | "education" | "summary" | "Resume" | "Experience" | "Project" | "Education" | "Summary"
+export type AdamModalType = "experience" | "project" | "education" | "summary" | "Experience" | "Project" | "Education" | "Summary"
 
 export interface AdamModalUrl {
   icon: string

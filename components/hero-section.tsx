@@ -13,7 +13,7 @@ export default function HeroSection() {
   const phrases = [
     "Adán Flores",
     "a Researcher",
-    "an AI Engineer",
+    "an Engineer",
   ]
 
   useEffect(() => {
@@ -92,22 +92,20 @@ export default function HeroSection() {
           <p className="text-xl md:text-2xl text-white/80 mb-8">from San Luis Potosí, México.</p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#contact"
-              onClick={(e) => {
-                e.preventDefault()
-                const contactSection = document.getElementById("contact")
-                if (contactSection) {
-                  window.scrollTo({
-                    top: contactSection.offsetTop - 80,
-                    behavior: "smooth",
-                  })
-                }
-              }}
-              className="px-8 py-3 bg-primary hover:bg-primary-700 text-white rounded-full transition-colors"
+            <Link
+              href="/adam"
+              className="relative px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 justify-center shadow-lg overflow-hidden group animate-[breathe_3s_ease-in-out_infinite]"
             >
-              Hire Me
-            </a>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute top-1 left-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping"></div>
+                <div className="absolute top-3 right-4 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDelay: "0.2s" }}></div>
+                <div className="absolute bottom-2 left-6 w-1 h-1 bg-pink-300 rounded-full animate-ping" style={{ animationDelay: "0.4s" }}></div>
+                <div className="absolute bottom-1 right-2 w-1 h-1 bg-green-300 rounded-full animate-ping" style={{ animationDelay: "0.6s" }}></div>
+              </div>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-300"></div>
+              <Bot className="w-5 h-5 relative z-10" />
+              <span className="relative z-10">My Virtual-Twin</span>
+            </Link>
             <a
               href="#portfolio"
               onClick={(e) => {
@@ -124,20 +122,22 @@ export default function HeroSection() {
             >
               View My Work
             </a>
-            <Link
-              href="/adam"
-              className="relative px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 justify-center shadow-lg overflow-hidden group animate-[breathe_3s_ease-in-out_infinite]"
+            <a
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault()
+                const contactSection = document.getElementById("contact")
+                if (contactSection) {
+                  window.scrollTo({
+                    top: contactSection.offsetTop - 80,
+                    behavior: "smooth",
+                  })
+                }
+              }}
+              className="px-8 py-3 bg-primary hover:bg-primary-700 text-white rounded-full transition-colors"
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute top-1 left-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping"></div>
-                <div className="absolute top-3 right-4 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDelay: "0.2s" }}></div>
-                <div className="absolute bottom-2 left-6 w-1 h-1 bg-pink-300 rounded-full animate-ping" style={{ animationDelay: "0.4s" }}></div>
-                <div className="absolute bottom-1 right-2 w-1 h-1 bg-green-300 rounded-full animate-ping" style={{ animationDelay: "0.6s" }}></div>
-              </div>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-300"></div>
-              <Bot className="w-5 h-5 relative z-10" />
-              <span className="relative z-10">AI Chat</span>
-            </Link>
+              Contact Me
+            </a>
           </div>
         </div>
       </div>
