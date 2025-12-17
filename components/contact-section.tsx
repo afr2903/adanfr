@@ -62,8 +62,7 @@ export default function ContactSection() {
           <div>
             <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
             <p className="text-white/70 mb-8">
-              I'm interested in research opportunities, especially in AI for robotics. If you have
-              any questions or would like to discuss potential collaborations, feel free to contact me.
+              If you have any questions or would like to discuss potential collaborations, feel free to contact me.
             </p>
 
             <div className="space-y-6">

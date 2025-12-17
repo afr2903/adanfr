@@ -1,4 +1,10 @@
-export type AdamModalType = "resume" | "experience" | "project" | "education" | "summary" | "Resume" | "Experience" | "Project" | "Education" | "Summary"
+export type AdamModalType = "experience" | "project" | "education" | "summary" | "Experience" | "Project" | "Education" | "Summary"
+
+export interface AdamModalUrl {
+  icon: string
+  name: string
+  link: string
+}
 
 export interface AdamModal {
   id: string
@@ -10,6 +16,14 @@ export interface AdamModal {
   linkHref?: string
   linkLabel?: string
   sourceIds?: string[]
+  // Enhanced fields for rich modal display
+  technologies?: string[]
+  client?: string
+  industry?: string
+  date?: string
+  role?: string
+  company?: string
+  urls?: AdamModalUrl[]
 }
 
 export type LensType = 'none' | 'recruiter' | 'collaborator' | 'researcher' | 'founder'

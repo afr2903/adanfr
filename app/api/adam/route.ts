@@ -31,7 +31,7 @@ function rankByRelevance<T extends { id: string }>(items: T[], queryTokens: stri
 }
 
 function buildExperienceModal(id: string): AdamModal | null {
-  const exp = experiences.find((e) => e.id === id)
+  const exp = experiences.find((e) => e.id === id) as any
   if (!exp) return null
   return {
     id: `experience-${exp.id}`,
@@ -40,12 +40,24 @@ function buildExperienceModal(id: string): AdamModal | null {
     body: exp.details.description,
     images: exp.details.images,
     sourceIds: [exp.id],
+    // Enhanced fields
+    technologies: exp.details?.skills || [],
+    client: exp.client || exp.company,
+    industry: exp.industry || null,
+    date: exp.period || null,
+    role: exp.role,
+    company: exp.company,
+    urls: exp.urls || [],
   }
 }
 
 function buildProjectModal(id: string): AdamModal | null {
-  const proj = projects.find((p) => p.id === id)
+  const proj = projects.find((p) => p.id === id) as any
   if (!proj) return null
+  // Parse technologies from comma-separated string
+  const techArray = typeof proj.technologies === 'string'
+    ? proj.technologies.split(',').map((t: string) => t.trim())
+    : proj.technologies || []
   return {
     id: `project-${proj.id}`,
     type: "project",
@@ -53,13 +65,19 @@ function buildProjectModal(id: string): AdamModal | null {
     body: proj.projectInfo,
     images: proj.details?.images,
     sourceIds: [proj.id],
+    // Enhanced fields
+    technologies: techArray,
+    client: proj.client || null,
+    industry: proj.industry || null,
+    date: proj.date || null,
+    urls: proj.urls || [],
   }
 }
 
 function buildEducationModal(id: string): AdamModal | null {
-  const edu = education.find((e) => e.id === id)
+  const edu = education.find((e) => e.id === id) as any
   if (!edu) return null
-  const images = (edu as any).images || (edu as any).image ? [(edu as any).image] : []
+  const images = edu.images || (edu.image ? [edu.image] : [])
   return {
     id: `education-${edu.id}`,
     type: "education",
@@ -67,6 +85,10 @@ function buildEducationModal(id: string): AdamModal | null {
     body: edu.description,
     images: images,
     sourceIds: [edu.id],
+    // Enhanced fields
+    client: edu.institution,
+    date: edu.period || `${edu.startYear} - ${edu.endYear || 'Present'}`,
+    technologies: edu.coursework || [],
   }
 }
 
