@@ -25,7 +25,7 @@ export const education = [
   {
     id: "mit-dsml-program",
     logo: "/images/logos/mit.png",
-    institution: "Massachussets Institute of Technology",
+    institution: "Massachusetts Institute of Technology",
     degree: "Data Science and Machine Learning Program",
     period: "Dec. 2024 - Mar. 2025",
     location: "Remote",

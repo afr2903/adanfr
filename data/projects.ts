@@ -6,23 +6,23 @@ export const projects = [
     image: "/images/projects/frida-cortex-1.png",
     projectInfo: [
       "Developed a multi-stage pipeline to bridge the gap between abstract command interpretation and physically grounded execution for domestic service robots. The pipeline consists of an automated process to generate a task-specific dataset for fine-tuning LLMs, a model-agnostic schema-aligned parsing system that guarantees syntactically valid plans and prevents action-level hallucinations, and a pre-execution grounding stage using a vectorized knowledge base to align commands with the robot’s real-world perception.",
-      "The system was scoped for and benchmarked using commands from the RoboCup at Home GPSR task. Experiments demonstrate that the fine-tuned model, deployed on the robot’s embedded hardware (Jetson AGX Orin), achieves a 96.5% success rate on linguistically diverse commands, outperforming both the non-fine-tuned baseline (29.6%) and a leading cloud-based model (90.4%). Furthermore, the schema-aligned parser proved to be 11% more dependable than standard token constrained generation methods.",
-      "First author. Accepted for publication in conference proceedings of MICAI 2025 at Springer LNAI."
+      "The system was scoped for and benchmarked using commands from the RoboCup at Home GPSR task. Experiments demonstrate that the fine-tuned model, deployed on the robot's embedded hardware (Jetson AGX Orin), achieves a 96.5% success rate on linguistically diverse commands, outperforming both the non-fine-tuned baseline (29.6%) and a leading cloud-based model (90.4%). Furthermore, the schema-aligned parser proved to be 11% more dependable than standard token constrained generation methods.",
+      "First author. Published in conference proceedings of MICAI 2025 at Springer LNAI. Awarded 2nd Best Student Paper at Mexico's premier AI conference."
     ],
     client: "Tecnológico de Monterrey, RoBorregos, RoboCup",
     technologies: "Python, LLMs, BAML, RAG, Robotics, PyTorch, Research writing",
     industry: "Service Robotics",
-    date: "May 2025 - September 2025",
+    date: "May 2025 - November 2025",
     details: {
       images: [
-        "/images/projects/frida-cortex-1.png",
-        "/images/projects/frida-cortex-2.png",
-        "/images/projects/frida-cortex-3.png",
+        "/images/projects/micai25-paper-main-figure.png",
+        "/images/projects/micai25-diploma-award-with-team.jpg",
+        "/images/projects/micai25-2nd-best-student-paper-award.png",
       ],
     },
     urls: [
+      { icon: "fa-solid fa-file", name: "Paper in Springer LNAI", link: "https://link.springer.com/chapter/10.1007/978-3-032-09037-9_24" },
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/RoBorregos/frida-cortex" },
-      { icon: "fa-brands fa-youtube", name: "Explanatory video demonstration of task planning test using the command interpreter with the robot", link: "https://www.youtube.com/watch?v=do1S1zfmMsA" },
       { icon: "fa-brands fa-youtube", name: "Video demonstration of the GPSR task during the Mexican Robotics Tournament 2025", link: "https://youtube.com/shorts/0bMz6ESv6B8" },
     ],
   },
@@ -34,7 +34,7 @@ export const projects = [
     projectInfo: [
       "Introduced a modular and hierarchical software architecture for service robots, addressing the challenge of integrating diverse capabilities into a cohesive system. The framework features a three-stage design: a modular software architecture with standardized interfaces for decoupled communication; a hierarchical task management system that translates high-level goals into executable actions through deterministic state machines; and a containerized, multi-platform deployment workflow ensuring reproducibility across diverse hardware settings.",
       "The benefits of this unified approach are validated through its implementation on a physical robot, and its performance in the demanding and dynamic environment of the RoboCup@Home competition. This work provides a blueprint for the systematic development and deployment of complex robotic systems. It demonstrates a practical methodology that addresses the full software life-cycle, from initial design to real-world execution.",
-      "First author. Under review for publication in conference proceedings of IEEE/SICE Symposium on System Integration 2026."
+      "First author. Accepted for publication in conference proceedings of IEEE/SICE Symposium on System Integration 2026."
     ],
     client: "Tecnológico de Monterrey, RoBorregos, RoboCup",
     technologies: "ROS2, Docker, Nvidia Jetson, Bash, Python, MoveIt, Yolo, Research writing",
@@ -42,9 +42,9 @@ export const projects = [
     date: "June 2025 - August 2025",
     details: {
       images: [
-        "/images/projects/sii2026-1.png",
-        "/images/projects/sii2026-2.png",
-        "/images/projects/sii2026-3.png",
+        "/images/projects/toolkit-robocup-task-management-strategy.png",
+        "/images/projects/toolkit-robocup-modular-architecture.png",
+        "/images/projects/toolkit-robocup-practical-example.png",
       ],
     },
     urls: [
@@ -57,10 +57,10 @@ export const projects = [
     id: "viper",
     title: "Immersive Cognitive Factory Twin",
     category: "Research",
-    image: "/images/projects/viper-1.png",
+    image: "/images/projects/immersive-cog-factory-twin-framework-diagram.png",
     projectInfo: [
-      "The system features an immersive VR simulation for visualizing factory operations, a neural network trained on simulated data to predict KPIs, and an integrated LLM to analyze predictions and suggest actionable improvements via natural language within the VR interface, to enhance key performance indicators (KPIs)",
-      "A proof-of-concept simulation of a three-station assembly process demonstrated significant practical advantages: applying LLM-driven recommendations yielded a 43.9% throughput increase and a 43.6% scrap reduction compared with the baseline.",
+      "The system features an immersive VR simulation for visualizing factory operations, a neural network trained on simulated data to predict KPIs, and an integrated LLM to analyze predictions and suggest actionable improvements via natural language within the VR interface.",
+      "Simulation experiments demonstrated 29% production improvement and 36% waste reduction compared to traditional training methods.",
       "This framework empowers managers with real-time, actionable insights for substantial gains in factory efficiency and resource optimization.",
       "First author. Under review for publication in journal Taylor & Francis: Production and Manufacturing Research."
     ],
@@ -70,9 +70,9 @@ export const projects = [
     date: "September 2024 - May 2025",
     details: {
       images: [
-        "/images/projects/viper-1.png",
-        "/images/projects/viper-2.png",
-        "/images/projects/viper-3.png",
+        "/images/projects/immersive-cog-factory-twin-framework-diagram.png",
+        "/images/projects/immersive-cog-factory-twin-case-study-process.png",
+        "/images/projects/immersive-cog-factory-twin-neural-network.png",
       ],
     },
     urls: [
@@ -83,7 +83,7 @@ export const projects = [
     id: "nutec",
     title: "Temperature Uniformity Prediction for Industrial Furnaces",
     category: "Undergraduate",
-    image: "/images/projects/nutec-1.png",
+    image: "/images/projects/nutec-temperature-prediction-plot.png",
     projectInfo: [
       "Developed a predictive system using multivariable linear regression to estimate temperature uniformity (R2=0.80) and ramp time (R2=0.74) in industrial furnaces. This system reduces the need for expensive physical prototypes and extensive testing, optimizing design cycles for companies like Nutec Bickley.",
       "Overcame initial challenges in data quality, including missing values and disorganization, through a robust cleaning and transformation process. While successful for uniformity and ramp time, the model's low R2 for lag time (0.17) indicates a need for further exploration into non-linear models or additional influencing variables.",
@@ -94,9 +94,9 @@ export const projects = [
     date: "March 2025 - June 2025",
     details: {
       images: [
-        "/images/projects/nutec-1.png",
-        "/images/projects/nutec-2.jpeg",
-        "/images/projects/nutec-3.jpeg",
+        "/images/projects/nutec-temperature-prediction-plot.png",
+        "/images/projects/nutec-project-team.jpeg",
+        "/images/projects/nutec-project-presentation.jpeg",
       ],
     },
     urls: [
@@ -108,7 +108,7 @@ export const projects = [
     id: "neuro-adaptive-room",
     title: "Neuro-adaptive meeting room",
     category: "Competitions",
-    image: "/images/projects/symbiosis-1.png",
+    image: "/images/projects/neuro-adaptive-room-neural-network.png",
     projectInfo: [
       "Team project for the Longetivy, AI and Cognitive Research Hackathon at MIT Media Lab: we ideated a proposal to create a meeting room capable of sensing the collective consciousness with only computer vision and machine learning models.",
       "Given the users desired purpose (focus, creative, etc.) it would control environmental parameters such as lighting, projections, scent, and sound.",
@@ -120,9 +120,9 @@ export const projects = [
     date: "October 2024",
     details: {
       images: [
-        "/images/projects/symbiosis-1.png",
-        "/images/projects/symbiosis-2.png",
-        "/images/projects/symbiosis-3.jpg",
+        "/images/projects/neuro-adaptive-room-neural-network.png",
+        "/images/projects/neuro-adaptive-room-concept-image.png",
+        "/images/projects/neuro-adaptive-room-team.jpg",
       ],
     },
     urls: [
@@ -134,7 +134,7 @@ export const projects = [
     id: "fred-device",
     title: "FibeR Extrusion Device Code",
     category: "Undergraduate",
-    image: "/images/projects/fred-device-2.png",
+    image: "/images/projects/fred-device-code-architecture.png",
     projectInfo: [
       "The former code for the Fiber Extrusion Device developed by the Massachusetts Institute of Technology was unusable for its poor readability and lack of modularity. I refactored it to improve its maintainability and scalability.",
       "The Python code was restructured into classes and functions, documented in GitHub for non-expert users. OpenCV optimizations were implemented, and multithreading and memory management were improved.",
@@ -144,7 +144,7 @@ export const projects = [
     industry: "EdTech",
     date: "October 2024",
     details: {
-      images: ["/images/projects/fred-device-2.png"],
+      images: ["/images/projects/fred-device-code-architecture.png"],
     },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/mit-fredfactory/fred-device/" },
@@ -154,7 +154,7 @@ export const projects = [
     id: "frida",
     title: "Friendly Robotic Interactive Domestic Assistant",
     category: "Competitions",
-    image: "/images/projects/frida-1.jpeg",
+    image: "/images/projects/frida-arm-pouring-cereal.jpeg",
     projectInfo: [
       "Development of the Friendly Robotic Interactive Domestic Assistant (FRIDA), an autonomous service robot with my university's robotics team, to compete in RoboCup @HOME 2024 research competition in Eindhoven. Capable of environment awareness and human-robot interaction to resolve any requests. Using ROS and ROS2 framework on Ubuntu 22.04 and Linux headless systems with Docker. Leading and working on:",
       "● Behavior Integration: Implementing CI/CD with Docker and CMake files and merging submodules with ROS nodes to achieve adaptive behaviors.",
@@ -167,9 +167,8 @@ export const projects = [
     date: "February 2024 - July 2024",
     details: {
       images: [
-        "/images/projects/frida-1.jpeg",
-        "/images/projects/frida-2.jpeg",
-        "/images/projects/frida-3.jpeg",
+        "/images/projects/frida-arm-pouring-cereal.jpeg",
+        "/images/projects/frida-execution-visualization-in-workstation.jpeg",
       ],
     },
     urls: [
@@ -183,7 +182,7 @@ export const projects = [
     id: "virtual-twin",
     title: "Smart Factory Virtual Twin",
     category: "Research",
-    image: "/images/projects/virtual-twin-1.png",
+    image: "/images/projects/clf-virtual-twin-presentation-title-slide.png",
     projectInfo: [
       "Created a digital twin of the cyber-physical factory in a Unity AR/VR application as an immersive learning tool.",
       "Led a team of students as Project Manager, assigning tasks for the Automation, Vision, Manufacturing and VR. In charge of maintenance of the robotic mobile bases' embedded systems, and to secure a stable IP ethernet network in the laboratory for Modbus communication.",
@@ -195,9 +194,9 @@ export const projects = [
     date: "February 2023 - March 2024",
     details: {
       images: [
-        "/images/projects/virtual-twin-1.png",
-        "/images/projects/virtual-twin-2.PNG",
-        "/images/projects/virtual-twin-3.PNG",
+        "/images/projects/clf-virtual-twin-presentation-title-slide.png",
+        "/images/projects/clf-virtual-twin-environment-controller.PNG",
+        "/images/projects/clf-virtual-twin-arm-simulation-teach-pendant.PNG",
       ],
     },
     urls: [
@@ -209,7 +208,7 @@ export const projects = [
     id: "fred-factory",
     title: "FrED Factory",
     category: "Undergraduate",
-    image: "/images/projects/fred-1.jpg",
+    image: "/images/projects/fred-assembly-electronics-station.jpg",
     projectInfo: [
       "Collaborative robotics challenge. Assembly of a production line with collaborative robots, PLCs, HMIs, sensors and actuators, also simulated in Tecnomatix.",
       "Led the programming and automation area of the project, implementing Software Engineering practices, documentation, Agile project management and innovative AI and data analysis features in the scope of Industry 5.0.",
@@ -218,7 +217,7 @@ export const projects = [
     technologies: "Python, Unity, SolidWorks, OpenAI, TiaPortal, SCRUM, Git",
     industry: "Industry 5.0",
     date: "February 2024 - May 2024",
-    details: { images: ["/images/projects/fred-1.jpg"] },
+    details: { images: ["/images/projects/fred-assembly-electronics-station.jpg"] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/afr2903/FrED-factory" },
     ],
@@ -227,7 +226,7 @@ export const projects = [
     id: "abb-welding",
     title: "Robotic Welding Cell Simulation",
     category: "Undergraduate",
-    image: "/images/projects/abb-1.png",
+    image: "/images/projects/abb-welding-cell-simulation-robotstudio.png",
     projectInfo: [
       "Simulating in RobotStudio an industrial welding station following ANSI/RIA and Industry 5.0 guidelines.",
       "Defined the project scope, financial analysis, quality deployment and risk assessment documentation.",
@@ -236,7 +235,7 @@ export const projects = [
     technologies: "Robot Studio, Excel, Financial analysis, Project management",
     industry: "Cyber-Physical Factories",
     date: "February 2023 - Present",
-    details: { images: ["/images/projects/abb-1.png"] },
+    details: { images: ["/images/projects/abb-welding-cell-simulation-robotstudio.png"] },
     urls: [
       { icon: "fa-brands fa-slideshare", name: "Final Presentation", link: "https://www.canva.com/design/DAGD3tWqgkQ/gLxbJ_A7HopHrsvZwxtAqw/view" },
     ],
@@ -245,7 +244,7 @@ export const projects = [
     id: "robocup-2023",
     title: "RoboCup @HOME 2023",
     category: "Competitions",
-    image: "/images/projects/home-1.png",
+    image: "/images/projects/robocup-home-2023-manipulation-place-process.png",
     projectInfo: [
       "2023 developments of an autonomous service robot with my university's robotics team. Capable of listening and responding to commands such as going to a target place or bringing specific objects.",
       "Behavior Integration: Merge of software submodules in a single script (node) to achieve adaptive behaviors.",
@@ -258,10 +257,8 @@ export const projects = [
     date: "January 2023 - December 2023",
     details: {
       images: [
-        "/images/projects/home-1.png",
-        "/images/projects/home-2.png",
-        "/images/projects/home-3.jpeg",
-        "/images/projects/home-4.jpg",
+        "/images/projects/robocup-home-2023-manipulation-place-process.png",
+        "/images/projects/robocup-home-2023-team.jpeg",
       ],
     },
     urls: [
@@ -275,7 +272,7 @@ export const projects = [
     id: "manchester",
     title: "Manchester Robotics Challenges",
     category: "Undergraduate",
-    image: "/images/projects/manchester-1.png",
+    image: "/images/projects/slam-navigation-gazebo.png",
     projectInfo: [
       "Completed courses on various robotics topics and implemented them in ROS as challenges, including SLAM using Kalman filters and sensor fusion, and PID/MPC control implementations with simulations in Gazebo.",
     ],
@@ -283,7 +280,7 @@ export const projects = [
     technologies: "ROS, Python, Control, Linux, Git",
     industry: "Educational Robotics",
     date: "February 2024 - March 2024",
-    details: { images: ["/images/projects/manchester-1.png", "/images/projects/manchester-2.png"] },
+    details: { images: ["/images/projects/slam-navigation-gazebo.png"] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/afr2903/MR3001B_Design_and_Development_of_Robots_I/" },
     ],
@@ -292,7 +289,7 @@ export const projects = [
     id: "robocupido",
     title: "RoboCupid 2024",
     category: "Undergraduate",
-    image: "/images/projects/robocupido-2.png",
+    image: "/images/projects/robocupido-landing.png",
     projectInfo: [
       "Software project for the university's robotics team, with Valentine's Day theme. Survey conducted to gather preferences and personalities, followed by a machine learning-based matching algorithm.",
       "Open questions processed using transformers to extract embeddings; other responses standardized with GPT-4. Closed questions processed with a decision tree.",
@@ -302,7 +299,7 @@ export const projects = [
     technologies: "Python, Transformers, OpenAI, SMTP",
     industry: "Software Development",
     date: "February 2024",
-    details: { images: ["/images/projects/robocupido-2.png", "/images/projects/robocupido-1.jpeg"] },
+    details: { images: ["/images/projects/robocupido-landing.png"] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/RoBorregos/robocupido_2024" },
     ],
@@ -311,7 +308,7 @@ export const projects = [
     id: "larc",
     title: "IEEE Latin American Robotics Competition",
     category: "Competitions",
-    image: "/images/projects/larc-1.jpg",
+    image: "/images/projects/larc-robot-and-award.jpg",
     projectInfo: [
       "Creation of an autonomous warehouse mobile robot at scale to compete in the IEEE Latin American Robotics Competition Open Challenge, held in Salvador Bahia, Brazil. First place achieved.",
       "Developed a stable solution using a single stereo camera for package identification and visual odometry; used ROS on Nvidia Jetson, custom low-level comms with microcontroller, Visual SLAM, custom CV models, and behavior integration.",
@@ -322,11 +319,9 @@ export const projects = [
     date: "February 2023 - October 2023",
     details: {
       images: [
-        "/images/projects/larc-1.jpg",
-        "/images/projects/larc-2.jpg",
-        "/images/projects/larc-3.png",
-        "/images/projects/larc-4.jpg",
-        "/images/projects/larc-5.jpg",
+        "/images/projects/larc-robot-and-award.jpg",
+        "/images/projects/larc-cube-cv-visualization.jpg",
+        "/images/projects/larc-all-teams.jpg",
       ],
     },
     urls: [
@@ -339,7 +334,7 @@ export const projects = [
     id: "stm32-car",
     title: "STM32 Based Autonomous Car",
     category: "Undergraduate",
-    image: "/images/projects/stm-1.png",
+    image: "/images/projects/stm32-car-prototype.png",
     projectInfo: [
       "University project for Industrial Automation class: autonomous car at scale with Ackerman steering, capable of receiving position commands and coordinates from Bluetooth device and executing with precision.",
       "Two PID controllers implemented; integrated IMU, GPS, ultrasonic, encoder sensors, Bluetooth; Unity simulation for coordinates.",
@@ -348,7 +343,7 @@ export const projects = [
     technologies: "C, STM32CubeIDE, PID Control, SolidWorks, Unity, Additive Manufacturing",
     industry: "Industrial Automation",
     date: "August 2023 - November 2023",
-    details: { images: ["/images/projects/stm-1.png", "/images/projects/stm-2.jpeg", "/images/projects/stm-3.png"] },
+    details: { images: ["/images/projects/stm32-car-prototype.png", "/images/projects/stm32-car-presentation.jpeg", "/images/projects/stm32-car-electronics.png"] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo main file", link: "https://github.com/afr2903/john-deere-sdv/blob/main/sdv.c" },
       { icon: "fa-solid fa-file", name: "Final report", link: "https://drive.google.com/file/d/1GDkEPaOw7KDgFyLfbbvv5QoR-i-RSVw7/view?usp=sharing" },
@@ -359,7 +354,7 @@ export const projects = [
     id: "waste-classifier",
     title: "Waste classifier machine",
     category: "Undergraduate",
-    image: "/images/projects/waste-classifier-1.png",
+    image: "/images/projects/waste-classifier-item-yolo-visualization.png",
     projectInfo: [
       "University project for the Mechatronic Design class: proposed a waste classifier machine to help fulfill the UN's Sustainable Development Goals. Identifies and separates plastic, glass, and aluminum using a YoloV8 model trained on a large dataset.",
     ],
@@ -368,9 +363,8 @@ export const projects = [
     industry: "Product Design",
     date: "October 2023 - November 2023",
     details: { images: [
-      "/images/projects/waste-classifier-1.png",
-      "/images/projects/waste-classifier-2.png",
-      "/images/projects/waste-classifier-3.png",
+      "/images/projects/waste-classifier-item-yolo-visualization.png",
+      "/images/projects/waste-classifier-prototype.png",
     ] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/afr2903/waste-classifier-machine" },
@@ -381,7 +375,7 @@ export const projects = [
     id: "goalkeeper",
     title: "Autonomous goalkeeper",
     category: "Undergraduate",
-    image: "/images/projects/goalkeeper-1.jpg",
+    image: "/images/projects/goalkeeper-vision-system.jpg",
     projectInfo: [
       "University project for Implementation of Mechatronic Systems: designed, manufactured and programmed a goalkeeper at scale with remote controller, and additionally implemented a fully autonomous machine using PixyCam and a PID controller.",
     ],
@@ -389,7 +383,7 @@ export const projects = [
     technologies: "Arduino, PixyMun, SolidWorks, Additive manufacturing, Laser cutting",
     industry: "Automation",
     date: "May 2023 - June 2023",
-    details: { images: ["/images/projects/goalkeeper-1.jpg", "/images/projects/goalkeeper-2.jpg"] },
+    details: { images: ["/images/projects/goalkeeper-vision-system.jpg", "/images/projects/goalkeeper-prototype.jpg"] },
     urls: [
       { icon: "fab fa-github", name: "GitHub Repo", link: "https://github.com/afr2903/goalkeeper-project" },
       { icon: "fa-solid fa-youtube", name: "Class competition video", link: "https://drive.google.com/file/d/12tiG7vA7d15Kj8mq1T6F-sR1WTa9EDdH/view?usp=sharing" },

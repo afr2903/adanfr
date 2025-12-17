@@ -4,6 +4,7 @@ import { Figtree, DM_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import ClientPathAware from "@/app/path-aware"
 import { Analytics } from "@vercel/analytics/next"
 
 const figtree = Figtree({
@@ -23,7 +24,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Adán Flores | Robotics & AI Engineer",
   description:
-    "Personal portfolio of Adán Flores, a Robotics and AI Engineer specializing in research and development.",
+    "Personal portfolio of Adán Flores, a Research Engineer specializing in human-computer interaction.",
     generator: 'v0.dev'
 }
 
@@ -42,9 +43,11 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={`${figtree.variable} ${dmSans.variable} bg-[#1f1f1f] text-white`}>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <ClientPathAware>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </ClientPathAware>
         <Analytics />
       </body>
     </html>
