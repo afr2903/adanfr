@@ -601,6 +601,80 @@ export default function ChatPage() {
 
 // --- Subcomponents ---
 
+// Image Carousel for multiple images
+function ImageCarousel({ images, title }: { images: string[]; title?: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
+  if (images.length === 1) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden">
+        <Image
+          src={images[0]}
+          alt={title || ""}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative aspect-video w-full overflow-hidden">
+      <Image
+        src={images[currentIndex]}
+        alt={`${title || "Image"} ${currentIndex + 1} of ${images.length}`}
+        fill
+        className="object-cover transition-all duration-300"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
+
+      {/* Navigation arrows */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
+        aria-label="Previous image"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        onClick={goToNext}
+        className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
+        aria-label="Next image"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={(e) => {
+              e.stopPropagation()
+              setCurrentIndex(index)
+            }}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              index === currentIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
+            }`}
+            aria-label={`Go to image ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Type badge colors
 const TYPE_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
   project: { bg: 'bg-blue-500/10', text: 'text-blue-400', icon: <Briefcase size={10} /> },
@@ -657,17 +731,9 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
         <X size={12} />
       </button>
 
-      {/* Image */}
+      {/* Image Carousel */}
       {modal.content.images && modal.content.images.length > 0 && (
-        <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={modal.content.images[0]}
-            alt={modal.title || ""}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
-        </div>
+        <ImageCarousel images={modal.content.images} title={modal.title} />
       )}
 
       {/* Content */}
