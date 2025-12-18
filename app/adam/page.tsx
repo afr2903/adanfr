@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight, Building2, Calendar, Briefcase, GraduationCap, User, Users, Search, Lightbulb, Link as LinkIcon } from "lucide-react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight, Building2, Calendar, Briefcase, GraduationCap, User, Users, Search, Lightbulb, Link as LinkIcon, Eye, Loader2, Brain } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ResumePreviewModal } from "@/components/resume"
+import type { ResumeData } from "@/types/resume"
 
 // --- Types ---
 
@@ -58,6 +60,13 @@ export default function ChatPage() {
   const [activeLens, setActiveLens] = useState<LensType>('none')
   const [isRecording, setIsRecording] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+  // Resume generation state
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const [isGeneratingResume, setIsGeneratingResume] = useState(false)
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [canGenerate, setCanGenerate] = useState(false) // Enabled after first message, disabled after clicking until new message
+  const [messagesSinceLastPreview, setMessagesSinceLastPreview] = useState(0)
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null)
@@ -112,6 +121,9 @@ export default function ChatPage() {
   const clearConversation = () => {
     setConversationHistory([])
     setModals([])
+    setResumeData(null)
+    setCanGenerate(false)
+    setMessagesSinceLastPreview(0)
     try {
       sessionStorage.removeItem(STORAGE_KEY)
     } catch { }
@@ -127,8 +139,9 @@ export default function ChatPage() {
     setIsTyping(true)
     setMessage("")
 
-    const lensContext = LENS_CONTEXTS[activeLens]
-    const messageWithLens = lensContext ? `${lensContext}\n${userMessage}` : userMessage
+    // Enable Generate button and track that new messages have been sent since last preview
+    setCanGenerate(true)
+    setMessagesSinceLastPreview(prev => prev + 1)
 
     const userEntry: ConversationEntry = {
       role: 'user',
@@ -144,7 +157,8 @@ export default function ChatPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            message: messageWithLens,
+            message: userMessage,
+            lens: activeLens,
             history: getHistoryForAPI() // API receives all, UI filters display
           }),
         })
@@ -267,6 +281,47 @@ export default function ChatPage() {
 
   const closeModal = (id: string) => {
     setModals(prev => prev.filter(m => m.id !== id))
+  }
+
+  // --- Resume Generation ---
+  const handleGenerateResume = async () => {
+    if (!canGenerate || isGeneratingResume) return
+
+    setIsGeneratingResume(true)
+    setCanGenerate(false) // Disable Generate button until new message is sent
+
+    try {
+      // Get user messages from conversation history
+      const userMessages = conversationHistory
+        .filter(entry => entry.role === 'user')
+        .map(entry => entry.content)
+
+      const res = await fetch("/api/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userMessages }),
+      })
+
+      const data = await res.json()
+
+      if (data.resume) {
+        setResumeData(data.resume)
+        setShowResumeModal(true)
+        setMessagesSinceLastPreview(0) // Reset counter after successful generation
+      } else {
+        console.error("Resume generation failed:", data.error)
+      }
+    } catch (error) {
+      console.error("Resume generation error:", error)
+    } finally {
+      setIsGeneratingResume(false)
+    }
+  }
+
+  const handlePreviewResume = () => {
+    if (!resumeData) return
+    // Open the modal to preview the resume
+    setShowResumeModal(true)
   }
 
   // --- Render ---
@@ -445,17 +500,83 @@ export default function ChatPage() {
             </div>
           ))}
 
-          {/* Resume CTA (Static) */}
-          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 group cursor-pointer hover:shadow-2xl hover:shadow-primary/10 transition-all">
+          {/* Resume CTA with Eye and Download buttons */}
+          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 group hover:shadow-2xl hover:shadow-primary/10 transition-all">
             <div className="bg-[#151515]/95 backdrop-blur rounded-xl p-6 relative overflow-hidden h-full">
-              <div className="relative z-10 flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
-                  <p className="text-xs text-white/50 mt-1">(COMING SOON) Generated from deck context</p>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
+                    <p className="text-xs text-white/50 mt-1">
+                      {conversationHistory.filter(e => e.role === 'user').length === 0
+                        ? "Send a message to enable generation"
+                        : resumeData
+                          ? "Resume generated from conversation"
+                          : "Click Generate to create from context"
+                      }
+                    </p>
+                  </div>
                 </div>
-                <div className="p-3 bg-white/5 rounded-full group-hover:bg-primary/20 transition-colors">
-                  <Download size={20} className="text-white" />
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  {/* Generate Button */}
+                  <button
+                    onClick={handleGenerateResume}
+                    disabled={!canGenerate || isGeneratingResume}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                      ${canGenerate && !isGeneratingResume
+                        ? 'bg-white/10 hover:bg-white/20 text-white cursor-pointer'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      }
+                    `}
+                    title={
+                      !canGenerate && conversationHistory.filter(e => e.role === 'user').length === 0
+                        ? "Send a message first"
+                        : !canGenerate
+                          ? "Send a new message to regenerate"
+                          : "Generate resume"
+                    }
+                  >
+                    {isGeneratingResume ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={16} />
+                        Generate
+                      </>
+                    )}
+                  </button>
+
+                  {/* Preview Button */}
+                  <button
+                    onClick={handlePreviewResume}
+                    disabled={!resumeData}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                      ${resumeData
+                        ? 'bg-primary hover:bg-primary/80 text-white cursor-pointer'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      }
+                    `}
+                    title={!resumeData ? "Generate a resume first" : "Preview resume"}
+                  >
+                    <Eye size={16} />
+                    Preview
+                  </button>
                 </div>
+
+                {/* New messages indicator */}
+                {resumeData && messagesSinceLastPreview > 0 && (
+                  <p className="text-xs text-primary/70 mt-3 flex items-center gap-1">
+                    <Sparkles size={12} />
+                    {messagesSinceLastPreview} new message{messagesSinceLastPreview > 1 ? 's' : ''} since last preview
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -463,6 +584,15 @@ export default function ChatPage() {
 
         <div className="h-20"></div>
       </div>
+
+      {/* Resume Preview Modal */}
+      {resumeData && (
+        <ResumePreviewModal
+          data={resumeData}
+          isOpen={showResumeModal}
+          onClose={() => setShowResumeModal(false)}
+        />
+      )}
     </div>
   )
 }

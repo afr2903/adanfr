@@ -1,0 +1,223 @@
+/* Resume.module.css - LaTeX-like styling with Times New Roman */
+
+.resume {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 11pt;
+  line-height: 1.3;
+  color: #000;
+  background: #fff;
+  padding: 0.5in 0.5in;
+  max-width: 8.5in;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 12pt;
+  border-bottom: 1px solid #000;
+  padding-bottom: 8pt;
+}
+
+.name {
+  font-size: 18pt;
+  font-weight: bold;
+  margin: 0 0 6pt 0;
+  letter-spacing: 0.5pt;
+  text-transform: uppercase;
+}
+
+.contactInfo {
+  font-size: 10pt;
+  color: #333;
+}
+
+.contactInfo a {
+  color: #333;
+  text-decoration: none;
+}
+
+.contactInfo a:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  color: #666;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 12pt;
+}
+
+.sectionTitle {
+  font-size: 12pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom: 1px solid #000;
+  margin: 0 0 6pt 0;
+  padding-bottom: 2pt;
+  letter-spacing: 0.5pt;
+}
+
+/* Summary */
+.summary {
+  margin: 0;
+  text-align: justify;
+}
+
+/* Entry (Education, Experience, Projects) */
+.entry {
+  margin-bottom: 10pt;
+}
+
+.entryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4pt;
+}
+
+.entryLeft {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4pt;
+  align-items: baseline;
+}
+
+.entryRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.entrySubheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1pt;
+}
+
+.institution,
+.organization {
+  font-weight: bold;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.location {
+  font-style: italic;
+  color: #444;
+}
+
+.dates {
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.degree {
+  font-style: italic;
+}
+
+.gpa {
+  font-style: normal;
+  color: #444;
+}
+
+/* Bullets */
+.bullets {
+  margin: 4pt 0 0 16pt;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.bullets li {
+  margin-bottom: 2pt;
+  text-align: justify;
+}
+
+/* Publications */
+.publication {
+  margin-bottom: 6pt;
+  text-indent: -16pt;
+  padding-left: 16pt;
+}
+
+.authors {
+  font-variant: normal;
+}
+
+.pubTitle {
+  font-style: italic;
+  margin-left: 4pt;
+}
+
+.venue {
+  margin-left: 4pt;
+}
+
+.status {
+  font-style: italic;
+  margin-left: 4pt;
+  color: #444;
+}
+
+.award {
+  font-weight: bold;
+  color: #006400;
+  margin-left: 4pt;
+}
+
+/* Skills */
+.skills {
+  margin: 0;
+}
+
+.skillRow {
+  margin-bottom: 2pt;
+}
+
+.skillCategory {
+  font-weight: bold;
+}
+
+.skillList {
+  margin-left: 4pt;
+}
+
+/* Projects */
+.projectDescription {
+  margin: 2pt 0 0 0;
+  text-align: justify;
+}
+
+.technologies {
+  margin: 2pt 0 0 0;
+  font-size: 10pt;
+  color: #444;
+}
+
+/* Print styles */
+@media print {
+  .resume {
+    padding: 0;
+    max-width: none;
+  }
+
+  .contactInfo a {
+    color: #000;
+  }
+}
+
+/* Dark mode container override (for preview in dark UI) */
+@media (prefers-color-scheme: dark) {
+  .resume {
+    /* Keep white background for resume preview even in dark mode */
+    background: #fff;
+    color: #000;
+  }
+}
