@@ -166,7 +166,7 @@ async function generateModalsHeuristically(message: string): Promise<AdamModal[]
 
 export async function POST(req: Request) {
   try {
-    const { message, history } = (await req.json()) as { message?: string; history?: string[] }
+    const { message, lens, history } = (await req.json()) as { message?: string; lens?: string; history?: string[] }
     if (!message || typeof message !== "string") {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
@@ -209,14 +209,17 @@ export async function POST(req: Request) {
             `Industry: ${proj.industry}\n` +
             `Date: ${proj.date}\n` +
             `Images: ${proj.details?.images?.join(', ') || 'none'}\n` +
-            `URLs: ${proj.urls?.map(url => url.name).join(', ')}\n`
+            (proj.urls && proj.urls.length > 0
+              ? `URLs:\n${proj.urls.map(url => `  - Name: ${url.name}\n    Link: ${url.link}\n    Icon: ${url.icon || 'globe'}`).join('\n')}\n`
+              : `URLs: none\n`)
           ).join('\n---\n')
 
         console.log("📊 Context prepared - Experiences:", experiences.length, "Projects:", projects.length)
         console.log("🚀 Calling BAML GenerateAdamModals...")
+        console.log("🔍 Lens:", lens || 'none')
 
         const startTime = Date.now()
-        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext, conversationHistory)
+        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext, conversationHistory, lens || 'none')
         const duration = Date.now() - startTime
 
         console.log(`⏱️  BAML call completed in ${duration}ms`)

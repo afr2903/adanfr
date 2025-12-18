@@ -23,6 +23,16 @@ client<llm> GEMINI_FLASH_2_5_LITE {
   }
 }
 
+client<llm> CLAUDE_HAIKU_4_5 {
+  provider "openai-generic"
+  retry_policy Constant
+  options {
+    base_url https://openrouter.ai/api/v1
+    api_key env.OPENROUTER_API_KEY
+    model "anthropic/claude-haiku-4.5"
+  }
+}
+
 client<llm> GPT_4O_MINI {
   provider "openai-generic"
   retry_policy Constant
