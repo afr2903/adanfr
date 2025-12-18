@@ -163,7 +163,8 @@ export default function ChatPage() {
           }),
         })
         const data: AdamResponse = await res.json()
-        const mapped = mapAdamResponseToChatModals(data)
+        const messageIndex = updatedHistory.filter(e => e.role === 'user').length
+        const mapped = mapAdamResponseToChatModals(data, messageIndex)
 
         setModals(prev => [...mapped, ...prev])
 
@@ -186,19 +187,20 @@ export default function ChatPage() {
         setIsTyping(false)
       }
     } else {
+      const messageIndex = updatedHistory.filter(e => e.role === 'user').length
       setTimeout(() => {
-        generateModals(userMessage)
+        generateModals(userMessage, messageIndex)
         setIsTyping(false)
       }, 1200)
     }
   }
 
-  const generateModals = (userMessage: string) => {
+  const generateModals = (userMessage: string, messageIndex: number) => {
     const newModals: ChatModal[] = []
 
     if (userMessage.toLowerCase().includes("vision")) {
       newModals.push({
-        id: Date.now() + "-1",
+        id: `${messageIndex}-experience-vision`,
         type: "experience",
         title: "Computer Vision Experience",
         content: {
@@ -216,7 +218,7 @@ export default function ChatPage() {
 
     // Summary Modal (Simplified)
     newModals.push({
-      id: Date.now() + "-sum",
+      id: `${messageIndex}-summary`,
       type: "summary",
       // No Title for summary
       content: {
@@ -230,9 +232,9 @@ export default function ChatPage() {
     if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
   }
 
-  function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
+  function mapAdamResponseToChatModals(resp: AdamResponse, messageIndex: number): ChatModal[] {
     return (resp.modals || []).map((m: any) => ({
-      id: m.id,
+      id: `${messageIndex}-${m.id}`,
       type: (m.type?.toLowerCase() as any) ?? "project",
       title: m.title,
       content: {
