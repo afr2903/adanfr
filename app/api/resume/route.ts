@@ -168,6 +168,7 @@ function transformBAMLResponse(bamlResponse: any): ResumeData {
 }
 
 export async function POST(req: Request) {
+  return NextResponse.json({ error: "Resume generation temporarily disabled" }, { status: 503 })  // COMING SOON
   try {
     const { userMessages } = (await req.json()) as { userMessages?: string[] }
 

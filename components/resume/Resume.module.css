@@ -1,62 +1,60 @@
-/* Resume.module.css - LaTeX-like styling with Times New Roman */
+/* Resume.module.css - LaTeX-style resume matching sb2nov/resume template */
 
 .resume {
-  font-family: "Times New Roman", Times, serif;
+  font-family: "Times New Roman", Times, Georgia, serif;
   font-size: 11pt;
-  line-height: 1.3;
+  line-height: 1.15;
   color: #000;
   background: #fff;
-  padding: 0.5in 0.5in;
+  padding: 0.5in;
   max-width: 8.5in;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
-/* Header */
+/* Header - centered name and contact */
 .header {
   text-align: center;
-  margin-bottom: 12pt;
-  border-bottom: 1px solid #000;
-  padding-bottom: 8pt;
+  margin-bottom: 6pt;
 }
 
 .name {
-  font-size: 18pt;
-  font-weight: bold;
-  margin: 0 0 6pt 0;
-  letter-spacing: 0.5pt;
-  text-transform: uppercase;
+  font-size: 26pt;
+  font-weight: normal;
+  font-variant: small-caps;
+  margin: 0 0 2pt 0;
+  letter-spacing: 1.5pt;
 }
 
 .contactInfo {
   font-size: 10pt;
-  color: #333;
+  color: #000;
+  line-height: 1.4;
 }
 
 .contactInfo a {
-  color: #333;
-  text-decoration: none;
-}
-
-.contactInfo a:hover {
+  color: #000;
   text-decoration: underline;
 }
 
 .separator {
-  color: #666;
+  color: #000;
+  margin: 0 3pt;
 }
 
 /* Sections */
 .section {
-  margin-bottom: 12pt;
+  margin-bottom: 8pt;
 }
 
 .sectionTitle {
-  font-size: 12pt;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-bottom: 1px solid #000;
-  margin: 0 0 6pt 0;
-  padding-bottom: 2pt;
+  font-size: 11pt;
+  font-weight: normal;
+  font-variant: small-caps;
+  text-transform: capitalize;
+  border-bottom: 0.8pt solid #000;
+  margin: 0 0 4pt 0;
+  padding-bottom: 1pt;
   letter-spacing: 0.5pt;
 }
 
@@ -64,26 +62,26 @@
 .summary {
   margin: 0;
   text-align: justify;
+  font-size: 11pt;
 }
 
 /* Entry (Education, Experience, Projects) */
 .entry {
-  margin-bottom: 10pt;
+  margin-bottom: 8pt;
 }
 
+/* Entry header with two-column layout */
 .entryHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4pt;
+  margin-bottom: 0;
 }
 
 .entryLeft {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4pt;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .entryRight {
@@ -91,60 +89,111 @@
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
+  flex-shrink: 0;
+}
+
+/* Education specific - title row */
+.entryTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
 }
 
 .entrySubheader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-top: 1pt;
+  width: 100%;
 }
 
-.institution,
-.organization {
+/* Institution/Organization names */
+.institution {
   font-weight: bold;
+  font-size: 11pt;
 }
 
+.organization {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+/* Job/Position title */
 .title {
   font-weight: bold;
+  font-size: 11pt;
 }
 
+/* Location styling */
 .location {
   font-style: italic;
-  color: #444;
+  font-size: 10pt;
 }
 
+/* Dates styling */
 .dates {
   font-style: italic;
+  font-size: 10pt;
   white-space: nowrap;
 }
 
+/* Degree styling */
 .degree {
   font-style: italic;
+  font-size: 10pt;
 }
 
 .gpa {
-  font-style: normal;
-  color: #444;
+  font-style: italic;
+  font-size: 10pt;
+}
+
+/* Advisor line */
+.advisors {
+  font-size: 10pt;
+  font-style: italic;
 }
 
 /* Bullets */
 .bullets {
-  margin: 4pt 0 0 16pt;
+  margin: 2pt 0 0 15pt;
   padding: 0;
   list-style-type: disc;
 }
 
 .bullets li {
-  margin-bottom: 2pt;
+  margin-bottom: 1pt;
   text-align: justify;
+  font-size: 10pt;
+  padding-left: 2pt;
+}
+
+.bullets li::marker {
+  font-size: 8pt;
+}
+
+/* Highlight bullet (for education) */
+.highlightBullet {
+  font-size: 10pt;
+  margin: 2pt 0 0 0;
+  padding-left: 15pt;
 }
 
 /* Publications */
+.publicationsList {
+  margin: 0;
+  padding-left: 15pt;
+}
+
 .publication {
-  margin-bottom: 6pt;
-  text-indent: -16pt;
-  padding-left: 16pt;
+  margin-bottom: 4pt;
+  font-size: 10pt;
+  text-indent: -15pt;
+  padding-left: 0;
+}
+
+.pubNumber {
+  font-weight: bold;
 }
 
 .authors {
@@ -152,33 +201,31 @@
 }
 
 .pubTitle {
-  font-style: italic;
-  margin-left: 4pt;
+  margin-left: 0;
 }
 
 .venue {
-  margin-left: 4pt;
+  font-style: italic;
 }
 
 .status {
-  font-style: italic;
-  margin-left: 4pt;
-  color: #444;
+  font-style: normal;
 }
 
 .award {
   font-weight: bold;
-  color: #006400;
-  margin-left: 4pt;
 }
 
-/* Skills */
+/* Skills - compact inline format */
 .skills {
   margin: 0;
+  font-size: 10pt;
 }
 
 .skillRow {
   margin-bottom: 2pt;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .skillCategory {
@@ -189,34 +236,55 @@
   margin-left: 4pt;
 }
 
+/* Multiple skill categories on same line */
+.skillsInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12pt;
+}
+
 /* Projects */
 .projectDescription {
   margin: 2pt 0 0 0;
   text-align: justify;
+  font-size: 10pt;
 }
 
 .technologies {
   margin: 2pt 0 0 0;
   font-size: 10pt;
-  color: #444;
 }
 
 /* Print styles */
 @media print {
   .resume {
-    padding: 0;
+    padding: 0.5in;
     max-width: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .contactInfo a {
     color: #000;
+    text-decoration: underline;
+  }
+
+  .section {
+    page-break-inside: avoid;
+  }
+
+  .entry {
+    page-break-inside: avoid;
+  }
+
+  .publication {
+    page-break-inside: avoid;
   }
 }
 
 /* Dark mode container override (for preview in dark UI) */
 @media (prefers-color-scheme: dark) {
   .resume {
-    /* Keep white background for resume preview even in dark mode */
     background: #fff;
     color: #000;
   }

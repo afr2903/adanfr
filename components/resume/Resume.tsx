@@ -31,33 +31,24 @@ const Resume = forwardRef<HTMLDivElement, ResumeProps>(({ data }, ref) => {
             contact.linkedin,
             contact.github,
             contact.website,
-            contact.location,
           ]
             .filter(Boolean)
             .map((item, i, arr) => (
               <span key={i}>
                 {item?.includes("@") ? (
                   <a href={`mailto:${item}`}>{item}</a>
-                ) : item?.includes("linkedin") || item?.includes("github") ? (
+                ) : item?.includes("linkedin") || item?.includes("github") || item?.includes("http") ? (
                   <a href={item?.startsWith("http") ? item : `https://${item}`} target="_blank" rel="noreferrer">
-                    {item}
+                    {item?.replace(/^https?:\/\//, "")}
                   </a>
                 ) : (
                   item
                 )}
-                {i < arr.length - 1 && <span className={styles.separator}> | </span>}
+                {i < arr.length - 1 && <span className={styles.separator}>|</span>}
               </span>
             ))}
         </div>
       </header>
-
-      {/* Summary */}
-      {summary && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Summary</h2>
-          <p className={styles.summary}>{summary}</p>
-        </section>
-      )}
 
       {/* Sections */}
       {sections.map((section, idx) => (
@@ -65,6 +56,14 @@ const Resume = forwardRef<HTMLDivElement, ResumeProps>(({ data }, ref) => {
           {renderSection(section)}
         </section>
       ))}
+
+      {/* Summary at the end if present */}
+      {summary && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Summary</h2>
+          <p className={styles.summary}>{summary}</p>
+        </section>
+      )}
     </div>
   )
 })
@@ -79,23 +78,24 @@ function renderSection(section: ResumeSection) {
           <h2 className={styles.sectionTitle}>{section.title}</h2>
           {(section.items as EducationItem[]).map((item, i) => (
             <div key={i} className={styles.entry}>
+              {/* Row 1: Institution | Location */}
               <div className={styles.entryHeader}>
-                <div className={styles.entryLeft}>
-                  <span className={styles.institution}>{item.institution}</span>
-                  {item.location && <span className={styles.location}>{item.location}</span>}
-                </div>
+                <span className={styles.institution}>{item.institution}</span>
+                {item.location && <span className={styles.location}>{item.location}</span>}
+              </div>
+              {/* Row 2: Degree, GPA | Dates */}
+              <div className={styles.entrySubheader}>
+                <span className={styles.degree}>
+                  {item.degree}
+                  {item.gpa && `, GPA ${item.gpa}`}
+                </span>
                 <span className={styles.dates}>{item.dates}</span>
               </div>
-              <div className={styles.entrySubheader}>
-                <span className={styles.degree}>{item.degree}</span>
-                {item.gpa && <span className={styles.gpa}>GPA: {item.gpa}</span>}
-              </div>
+              {/* Highlights as simple text (not bulleted for education) */}
               {item.highlights && item.highlights.length > 0 && (
-                <ul className={styles.bullets}>
-                  {item.highlights.map((h, j) => (
-                    <li key={j}>{h}</li>
-                  ))}
-                </ul>
+                item.highlights.map((h, j) => (
+                  <div key={j} className={styles.highlightBullet}>{h}</div>
+                ))
               )}
             </div>
           ))}
@@ -108,16 +108,17 @@ function renderSection(section: ResumeSection) {
           <h2 className={styles.sectionTitle}>{section.title}</h2>
           {(section.items as ExperienceItem[]).map((item, i) => (
             <div key={i} className={styles.entry}>
+              {/* Row 1: Title | Dates */}
               <div className={styles.entryHeader}>
-                <div className={styles.entryLeft}>
-                  <span className={styles.title}>{item.title}</span>
-                  <span className={styles.organization}>{item.organization}</span>
-                </div>
-                <div className={styles.entryRight}>
-                  <span className={styles.dates}>{item.dates}</span>
-                  {item.location && <span className={styles.location}>{item.location}</span>}
-                </div>
+                <span className={styles.title}>{item.title}</span>
+                <span className={styles.dates}>{item.dates}</span>
               </div>
+              {/* Row 2: Organization | Location */}
+              <div className={styles.entrySubheader}>
+                <span className={styles.organization}>{item.organization}</span>
+                {item.location && <span className={styles.location}>{item.location}</span>}
+              </div>
+              {/* Bullets */}
               {item.bullets && item.bullets.length > 0 && (
                 <ul className={styles.bullets}>
                   {item.bullets.map((b, j) => (
@@ -134,15 +135,18 @@ function renderSection(section: ResumeSection) {
       return (
         <>
           <h2 className={styles.sectionTitle}>{section.title}</h2>
-          {(section.items as PublicationItem[]).map((item, i) => (
-            <div key={i} className={styles.publication}>
-              <span className={styles.authors}>{item.authors}</span>
-              <span className={styles.pubTitle}>"{item.title},"</span>
-              <span className={styles.venue}>{item.venue}</span>
-              {item.status && <span className={styles.status}>({item.status})</span>}
-              {item.award && <span className={styles.award}>{item.award}</span>}
-            </div>
-          ))}
+          <div className={styles.publicationsList}>
+            {(section.items as PublicationItem[]).map((item, i) => (
+              <div key={i} className={styles.publication}>
+                <span className={styles.pubNumber}>[{i + 1}]</span>{" "}
+                <span className={styles.authors}>{item.authors},</span>{" "}
+                <span className={styles.pubTitle}>"{item.title},"</span>{" "}
+                <span className={styles.venue}>{item.venue}</span>
+                {item.award && <span className={styles.award}>. {item.award}</span>}
+                {item.status && <span className={styles.status}>. {item.status}.</span>}
+              </div>
+            ))}
+          </div>
         </>
       )
 
@@ -151,11 +155,12 @@ function renderSection(section: ResumeSection) {
         <>
           <h2 className={styles.sectionTitle}>{section.title}</h2>
           <div className={styles.skills}>
-            {(section.items as SkillCategory[]).map((cat, i) => (
-              <div key={i} className={styles.skillRow}>
+            {(section.items as SkillCategory[]).map((cat, i, arr) => (
+              <span key={i} className={styles.skillRow}>
                 <span className={styles.skillCategory}>{cat.category}:</span>
                 <span className={styles.skillList}>{cat.skills.join(", ")}</span>
-              </div>
+                {i < arr.length - 1 && <span style={{ marginLeft: "12pt" }}></span>}
+              </span>
             ))}
           </div>
         </>
@@ -168,12 +173,14 @@ function renderSection(section: ResumeSection) {
           {(section.items as ProjectItem[]).map((item, i) => (
             <div key={i} className={styles.entry}>
               <div className={styles.entryHeader}>
-                <div className={styles.entryLeft}>
-                  <span className={styles.title}>{item.title}</span>
-                  {item.organization && <span className={styles.organization}>{item.organization}</span>}
-                </div>
+                <span className={styles.title}>{item.title}</span>
                 {item.dates && <span className={styles.dates}>{item.dates}</span>}
               </div>
+              {item.organization && (
+                <div className={styles.entrySubheader}>
+                  <span className={styles.organization}>{item.organization}</span>
+                </div>
+              )}
               <p className={styles.projectDescription}>{item.description}</p>
               {item.technologies && item.technologies.length > 0 && (
                 <p className={styles.technologies}>

@@ -9,8 +9,15 @@ interface PDFOptions {
   filename?: string
   margin?: number | number[]
   image?: { type: string; quality: number }
-  html2canvas?: { scale: number; useCORS: boolean; letterRendering: boolean }
+  html2canvas?: {
+    scale: number
+    useCORS: boolean
+    letterRendering: boolean
+    logging: boolean
+    windowWidth?: number
+  }
   jsPDF?: { unit: string; format: string; orientation: string }
+  pagebreak?: { mode: string[] }
 }
 
 interface UsePDFDownloadOptions {
@@ -26,6 +33,26 @@ interface UsePDFDownloadReturn {
   isDownloading: boolean
   error: Error | null
 }
+
+// CSS styles for print/PDF that match the LaTeX styling
+const getPrintStyles = () => `
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Times New Roman", Times, Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+`
 
 export function usePDFDownload(
   elementRef: React.RefObject<HTMLElement | null>,
@@ -53,19 +80,22 @@ export function usePDFDownload(
       const html2pdf = (await import("html2pdf.js")).default
 
       const pdfOptions: PDFOptions = {
-        margin: [0.25, 0.25, 0.25, 0.25],
+        margin: [0.5, 0.5, 0.5, 0.5], // 0.5 inch margins like LaTeX
         filename,
-        image: { type: "jpeg", quality: 0.98 },
+        image: { type: "jpeg", quality: 1 },
         html2canvas: {
-          scale: 2,
+          scale: 3, // Higher scale for better text quality
           useCORS: true,
           letterRendering: true,
+          logging: false,
+          windowWidth: 816, // 8.5 inches * 96 DPI
         },
         jsPDF: {
           unit: "in",
           format: "letter",
           orientation: "portrait",
         },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       }
 
       await html2pdf().set(pdfOptions).from(elementRef.current).save()
@@ -99,21 +129,27 @@ export function usePDFDownload(
 
     const content = elementRef.current.outerHTML
 
+    // Get all stylesheets from the current document
+    const styleSheets = Array.from(document.styleSheets)
+      .map((sheet) => {
+        try {
+          return Array.from(sheet.cssRules)
+            .map((rule) => rule.cssText)
+            .join("\n")
+        } catch {
+          return ""
+        }
+      })
+      .join("\n")
+
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
           <title>${filename.replace(".pdf", "")}</title>
           <style>
-            @page {
-              size: letter;
-              margin: 0.5in;
-            }
-            body {
-              margin: 0;
-              padding: 0;
-              font-family: "Times New Roman", Times, serif;
-            }
+            ${getPrintStyles()}
+            ${styleSheets}
           </style>
         </head>
         <body>
@@ -128,7 +164,7 @@ export function usePDFDownload(
     // Wait for content to load before printing
     setTimeout(() => {
       printWindow.print()
-    }, 250)
+    }, 500)
   }, [elementRef, filename, onError])
 
   return {
