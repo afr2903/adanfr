@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight, Building2, Calendar, Briefcase, GraduationCap, User, Users, Search, Lightbulb, Link as LinkIcon } from "lucide-react"
+import { Send, ArrowLeft, X, Download, ExternalLink, Mic, MicOff, RotateCcw, Sparkles, Github, Youtube, FileText, Globe, MessageSquare, ChevronLeft, ChevronRight, Building2, Calendar, Briefcase, GraduationCap, User, Users, Search, Lightbulb, Link as LinkIcon, Eye, Loader2, Brain } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ENABLE_BAML, ENABLE_DYNAMIC_RESUME, ENABLE_SPEECH } from "@/lib/feature-flags"
@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ResumePreviewModal } from "@/components/resume"
+import type { ResumeData } from "@/types/resume"
 
 // --- Types ---
 
@@ -58,6 +60,13 @@ export default function ChatPage() {
   const [activeLens, setActiveLens] = useState<LensType>('none')
   const [isRecording, setIsRecording] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+  // Resume generation state
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const [isGeneratingResume, setIsGeneratingResume] = useState(false)
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [canGenerate, setCanGenerate] = useState(false) // Enabled after first message, disabled after clicking until new message
+  const [messagesSinceLastPreview, setMessagesSinceLastPreview] = useState(0)
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null)
@@ -112,6 +121,9 @@ export default function ChatPage() {
   const clearConversation = () => {
     setConversationHistory([])
     setModals([])
+    setResumeData(null)
+    setCanGenerate(false)
+    setMessagesSinceLastPreview(0)
     try {
       sessionStorage.removeItem(STORAGE_KEY)
     } catch { }
@@ -127,8 +139,9 @@ export default function ChatPage() {
     setIsTyping(true)
     setMessage("")
 
-    const lensContext = LENS_CONTEXTS[activeLens]
-    const messageWithLens = lensContext ? `${lensContext}\n${userMessage}` : userMessage
+    // Enable Generate button and track that new messages have been sent since last preview
+    setCanGenerate(true)
+    setMessagesSinceLastPreview(prev => prev + 1)
 
     const userEntry: ConversationEntry = {
       role: 'user',
@@ -144,12 +157,14 @@ export default function ChatPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            message: messageWithLens,
+            message: userMessage,
+            lens: activeLens,
             history: getHistoryForAPI() // API receives all, UI filters display
           }),
         })
         const data: AdamResponse = await res.json()
-        const mapped = mapAdamResponseToChatModals(data)
+        const messageIndex = updatedHistory.filter(e => e.role === 'user').length
+        const mapped = mapAdamResponseToChatModals(data, messageIndex)
 
         setModals(prev => [...mapped, ...prev])
 
@@ -172,19 +187,20 @@ export default function ChatPage() {
         setIsTyping(false)
       }
     } else {
+      const messageIndex = updatedHistory.filter(e => e.role === 'user').length
       setTimeout(() => {
-        generateModals(userMessage)
+        generateModals(userMessage, messageIndex)
         setIsTyping(false)
       }, 1200)
     }
   }
 
-  const generateModals = (userMessage: string) => {
+  const generateModals = (userMessage: string, messageIndex: number) => {
     const newModals: ChatModal[] = []
 
     if (userMessage.toLowerCase().includes("vision")) {
       newModals.push({
-        id: Date.now() + "-1",
+        id: `${messageIndex}-experience-vision`,
         type: "experience",
         title: "Computer Vision Experience",
         content: {
@@ -202,7 +218,7 @@ export default function ChatPage() {
 
     // Summary Modal (Simplified)
     newModals.push({
-      id: Date.now() + "-sum",
+      id: `${messageIndex}-summary`,
       type: "summary",
       // No Title for summary
       content: {
@@ -216,9 +232,9 @@ export default function ChatPage() {
     if (ENABLE_DYNAMIC_RESUME) saveResumeDraft(newModals, userMessage)
   }
 
-  function mapAdamResponseToChatModals(resp: AdamResponse): ChatModal[] {
+  function mapAdamResponseToChatModals(resp: AdamResponse, messageIndex: number): ChatModal[] {
     return (resp.modals || []).map((m: any) => ({
-      id: m.id,
+      id: `${messageIndex}-${m.id}`,
       type: (m.type?.toLowerCase() as any) ?? "project",
       title: m.title,
       content: {
@@ -267,6 +283,47 @@ export default function ChatPage() {
 
   const closeModal = (id: string) => {
     setModals(prev => prev.filter(m => m.id !== id))
+  }
+
+  // --- Resume Generation ---
+  const handleGenerateResume = async () => {
+    if (!canGenerate || isGeneratingResume) return
+
+    setIsGeneratingResume(true)
+    setCanGenerate(false) // Disable Generate button until new message is sent
+
+    try {
+      // Get user messages from conversation history
+      const userMessages = conversationHistory
+        .filter(entry => entry.role === 'user')
+        .map(entry => entry.content)
+
+      const res = await fetch("/api/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userMessages }),
+      })
+
+      const data = await res.json()
+
+      if (data.resume) {
+        setResumeData(data.resume)
+        setShowResumeModal(true)
+        setMessagesSinceLastPreview(0) // Reset counter after successful generation
+      } else {
+        console.error("Resume generation failed:", data.error)
+      }
+    } catch (error) {
+      console.error("Resume generation error:", error)
+    } finally {
+      setIsGeneratingResume(false)
+    }
+  }
+
+  const handlePreviewResume = () => {
+    if (!resumeData) return
+    // Open the modal to preview the resume
+    setShowResumeModal(true)
   }
 
   // --- Render ---
@@ -445,17 +502,83 @@ export default function ChatPage() {
             </div>
           ))}
 
-          {/* Resume CTA (Static) */}
-          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 group cursor-pointer hover:shadow-2xl hover:shadow-primary/10 transition-all">
+          {/* Resume CTA with Eye and Download buttons */}
+          <div className="break-inside-avoid p-[1px] rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 group hover:shadow-2xl hover:shadow-primary/10 transition-all">
             <div className="bg-[#151515]/95 backdrop-blur rounded-xl p-6 relative overflow-hidden h-full">
-              <div className="relative z-10 flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
-                  <p className="text-xs text-white/50 mt-1">(COMING SOON) Generated from deck context</p>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>(WIP) Custom Resume</h3>
+                    <p className="text-xs text-white/50 mt-1">
+                      {conversationHistory.filter(e => e.role === 'user').length === 0
+                        ? "Send a message to enable generation"
+                        : resumeData
+                          ? "Resume generated from conversation"
+                          : "Click Generate to create from context"
+                      }
+                    </p>
+                  </div>
                 </div>
-                <div className="p-3 bg-white/5 rounded-full group-hover:bg-primary/20 transition-colors">
-                  <Download size={20} className="text-white" />
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  {/* Generate Button */}
+                  <button
+                    onClick={handleGenerateResume}
+                    disabled={!canGenerate || isGeneratingResume}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                      ${canGenerate && !isGeneratingResume
+                        ? 'bg-white/10 hover:bg-white/20 text-white cursor-pointer'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      }
+                    `}
+                    title={
+                      !canGenerate && conversationHistory.filter(e => e.role === 'user').length === 0
+                        ? "Send a message first"
+                        : !canGenerate
+                          ? "Send a new message to regenerate"
+                          : "Generate resume"
+                    }
+                  >
+                    {isGeneratingResume ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={16} />
+                        Generate
+                      </>
+                    )}
+                  </button>
+
+                  {/* Preview Button */}
+                  <button
+                    onClick={handlePreviewResume}
+                    disabled={!resumeData}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                      ${resumeData
+                        ? 'bg-primary hover:bg-primary/80 text-white cursor-pointer'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      }
+                    `}
+                    title={!resumeData ? "Generate a resume first" : "Preview resume"}
+                  >
+                    <Eye size={16} />
+                    Preview
+                  </button>
                 </div>
+
+                {/* New messages indicator */}
+                {resumeData && messagesSinceLastPreview > 0 && (
+                  <p className="text-xs text-primary/70 mt-3 flex items-center gap-1">
+                    <Sparkles size={12} />
+                    {messagesSinceLastPreview} new message{messagesSinceLastPreview > 1 ? 's' : ''} since last preview
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -463,11 +586,94 @@ export default function ChatPage() {
 
         <div className="h-20"></div>
       </div>
+
+      {/* Resume Preview Modal */}
+      {resumeData && (
+        <ResumePreviewModal
+          data={resumeData}
+          isOpen={showResumeModal}
+          onClose={() => setShowResumeModal(false)}
+        />
+      )}
     </div>
   )
 }
 
 // --- Subcomponents ---
+
+// Image Carousel for multiple images
+function ImageCarousel({ images, title }: { images: string[]; title?: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
+  if (images.length === 1) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden">
+        <Image
+          src={images[0]}
+          alt={title || ""}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative aspect-video w-full overflow-hidden">
+      <Image
+        src={images[currentIndex]}
+        alt={`${title || "Image"} ${currentIndex + 1} of ${images.length}`}
+        fill
+        className="object-cover transition-all duration-300"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
+
+      {/* Navigation arrows */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
+        aria-label="Previous image"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        onClick={goToNext}
+        className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
+        aria-label="Next image"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={(e) => {
+              e.stopPropagation()
+              setCurrentIndex(index)
+            }}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              index === currentIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
+            }`}
+            aria-label={`Go to image ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // Type badge colors
 const TYPE_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
@@ -525,17 +731,9 @@ function ContentCard({ modal, onClose }: { modal: ChatModal; onClose: () => void
         <X size={12} />
       </button>
 
-      {/* Image */}
+      {/* Image Carousel */}
       {modal.content.images && modal.content.images.length > 0 && (
-        <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={modal.content.images[0]}
-            alt={modal.title || ""}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1c1c1f] via-transparent to-transparent opacity-95"></div>
-        </div>
+        <ImageCarousel images={modal.content.images} title={modal.title} />
       )}
 
       {/* Content */}

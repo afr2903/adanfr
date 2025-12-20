@@ -4,6 +4,8 @@ import { projects } from "@/data/projects"
 import { education } from "@/data/education"
 import type { AdamModal, AdamResponse } from "@/lib/adam-types"
 import { b as bamlClient } from "../../../baml_client"
+import { Collector } from "@boundaryml/baml"
+import { getDb } from "@/lib/mongodb"
 
 function normalizeText(value: unknown): string {
   if (value == null) return ""
@@ -12,23 +14,6 @@ function normalizeText(value: unknown): string {
   return String(value)
 }
 
-function scoreRelevance(haystack: string, queryTokens: string[]): number {
-  const lower = haystack.toLowerCase()
-  let score = 0
-  for (const token of queryTokens) {
-    if (token.length < 3) continue
-    if (lower.includes(token)) score += 1
-  }
-  return score
-}
-
-function rankByRelevance<T extends { id: string }>(items: T[], queryTokens: string[], textGetter: (item: T) => string): T[] {
-  return [...items]
-    .map((item) => ({ item, score: scoreRelevance(textGetter(item), queryTokens) }))
-    .sort((a, b) => b.score - a.score)
-    .filter((x) => x.score > 0)
-    .map((x) => x.item)
-}
 
 function buildExperienceModal(id: string): AdamModal | null {
   const exp = experiences.find((e) => e.id === id) as any
@@ -92,16 +77,6 @@ function buildEducationModal(id: string): AdamModal | null {
   }
 }
 
-function buildResumeModal(): AdamModal {
-  return {
-    id: "resume",
-    type: "resume",
-    title: "Download Resume (PDF)",
-    body: "A tailored resume is ready. Click to download the latest PDF.",
-    linkHref: "/Adan_Flores_resume.pdf",
-    linkLabel: "Download Resume",
-  }
-}
 
 function buildSummaryModal(message: string, picked: AdamModal[]): AdamModal {
   const bullets = picked
@@ -124,49 +99,77 @@ function buildSummaryModal(message: string, picked: AdamModal[]): AdamModal {
   }
 }
 
-async function generateModalsHeuristically(message: string): Promise<AdamModal[]> {
-  const tokens = message
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean)
+// Log analytics to MongoDB (non-blocking, fails silently if MongoDB not configured)
+async function logAnalytics(data: {
+  userMessage: string
+  modals: any[]
+  lens: string
+  collector: Collector
+  duration: number
+  historyLength: number
+}) {
+  try {
+    if (!process.env.MONGODB_URI) {
+      return // MongoDB not configured, skip silently
+    }
 
-  const rankedExperiences = rankByRelevance(experiences as any, tokens, (e: any) =>
-    normalizeText({ company: e.company, role: e.role, description: e.description, details: e.details })
-  )
-  const rankedProjects = rankByRelevance(projects as any, tokens, (p: any) =>
-    normalizeText({ title: p.title, projectInfo: p.projectInfo, technologies: p.technologies, industry: p.industry })
-  )
-  const rankedEducation = rankByRelevance(education as any, tokens, (ed: any) =>
-    normalizeText({ institution: ed.institution, degree: ed.degree, description: ed.description, coursework: ed.coursework })
-  )
+    const db = await getDb()
+    const log = data.collector.last
+    
+    // Extract model info from the selected call
+    const selectedCall = log?.selectedCall || (log?.calls && log.calls.length > 0 ? log.calls[log.calls.length - 1] : null)
+    const model = (selectedCall as any)?.clientName || (selectedCall as any)?.provider || 'google/gemini-3-flash-preview'
+    
+    // Extract usage info
+    const usage = log?.usage || data.collector.usage
+    const inputTokens = (usage as any)?.inputTokens ?? (usage as any)?.input_tokens ?? null
+    const outputTokens = (usage as any)?.outputTokens ?? (usage as any)?.output_tokens ?? null
+    const cachedInputTokens = (usage as any)?.cachedInputTokens ?? (usage as any)?.cached_input_tokens ?? null
+    
+    // Extract timing
+    const timing = log?.timing
+    const bamlLatency = (timing as any)?.durationMs ?? (timing as any)?.duration_ms ?? data.duration
 
-  const modals: AdamModal[] = []
+    // Filter out null/undefined fields from modals
+    const cleanModals = data.modals.map(m => {
+      const clean: any = {}
+      Object.keys(m).forEach(key => {
+        const value = (m as any)[key]
+        if (value !== null && value !== undefined) {
+          clean[key] = value
+        }
+      })
+      return clean
+    })
 
-  // Always offer resume as one of the modals
-  modals.push(buildResumeModal())
-
-  if (rankedExperiences[0]) {
-    const m = buildExperienceModal((rankedExperiences[0] as any).id)
-    if (m) modals.push(m)
+    await db.collection('adam_interactions').insertOne({
+      userMessage: data.userMessage,
+      modals: cleanModals, // Store modals without null fields
+      modalsCount: data.modals.length,
+      modalTypes: data.modals.map(m => m.type),
+      lens: data.lens,
+      historyLength: data.historyLength,
+      // BAML metrics
+      model: model,
+      latency: bamlLatency,
+      inputTokens: inputTokens,
+      outputTokens: outputTokens,
+      cachedInputTokens: cachedInputTokens,
+      totalTokens: inputTokens && outputTokens ? inputTokens + outputTokens : null,
+      // Timestamps
+      timestamp: Date.now(),
+      createdAt: new Date()
+    })
+  } catch (error) {
+    // Fail silently - don't break the API if analytics fails
+    console.error("Analytics logging error:", error)
   }
-  if (rankedProjects[0]) {
-    const m = buildProjectModal((rankedProjects[0] as any).id)
-    if (m) modals.push(m)
-  } else if (rankedEducation[0]) {
-    const m = buildEducationModal((rankedEducation[0] as any).id)
-    if (m) modals.push(m)
-  }
-
-  // Cap at 4
-  const capped = modals.slice(0, 4)
-  const withSummary = [buildSummaryModal(message, capped), ...capped]
-  return withSummary.slice(0, 4)
 }
+
 
 export async function POST(req: Request) {
   try {
-    const { message, history } = (await req.json()) as { message?: string; history?: string[] }
+    const { message, lens, history } = (await req.json()) as { message?: string; lens?: string; history?: string[] }
     if (!message || typeof message !== "string") {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
@@ -209,25 +212,73 @@ export async function POST(req: Request) {
             `Industry: ${proj.industry}\n` +
             `Date: ${proj.date}\n` +
             `Images: ${proj.details?.images?.join(', ') || 'none'}\n` +
-            `URLs: ${proj.urls?.map(url => url.name).join(', ')}\n`
+            (proj.urls && proj.urls.length > 0
+              ? `URLs:\n${proj.urls.map(url => `  - Name: ${url.name}\n    Link: ${url.link}\n    Icon: ${url.icon || 'globe'}`).join('\n')}\n`
+              : `URLs: none\n`)
           ).join('\n---\n')
 
         console.log("📊 Context prepared - Experiences:", experiences.length, "Projects:", projects.length)
         console.log("🚀 Calling BAML GenerateAdamModals...")
+        console.log("🔍 Lens:", lens || 'none')
 
+        // Create collector to track usage and timing
+        const collector = new Collector("adam-analytics")
         const startTime = Date.now()
-        const aiResp = await bamlClient.GenerateAdamModals(message, experiencesContext, projectsContext, conversationHistory)
+        const aiResp = await bamlClient.GenerateAdamModals(
+          message, 
+          experiencesContext, 
+          projectsContext, 
+          conversationHistory, 
+          lens || 'none',
+          { collector }
+        )
         const duration = Date.now() - startTime
 
         console.log(`⏱️  BAML call completed in ${duration}ms`)
         console.log("📦 Raw BAML response:", JSON.stringify(aiResp, null, 2))
 
-        const asResp: AdamResponse = aiResp
+        // Convert BAML response to our type (handle null values)
+        const asResp: AdamResponse = {
+          ...aiResp,
+          modals: aiResp.modals.map(m => {
+            const modal: any = {
+              id: m.id,
+              type: m.type as any, // Type assertion needed due to case differences
+              title: m.title,
+              body: m.body,
+              reasoning: m.reasoning ?? undefined,
+              images: m.images ?? undefined,
+              sourceIds: m.sourceIds ?? undefined,
+              technologies: m.technologies ?? undefined,
+              client: m.client ?? undefined,
+              industry: m.industry ?? undefined,
+              date: m.date ?? undefined,
+              role: m.role ?? undefined,
+              company: m.company ?? undefined,
+              urls: m.urls ?? undefined
+            }
+            // Add linkHref/linkLabel if they exist in the BAML response
+            if ('linkHref' in m) modal.linkHref = (m as any).linkHref ?? undefined
+            if ('linkLabel' in m) modal.linkLabel = (m as any).linkLabel ?? undefined
+            return modal as AdamModal
+          })
+        }
 
         if (asResp && Array.isArray(asResp.modals) && asResp.modals.length > 0) {
           console.log("✅ BAML response generated successfully")
           console.log("📋 Number of modals:", asResp.modals.length)
           console.log("📋 Modal types:", asResp.modals.map(m => m.type).join(", "))
+          
+          // Log analytics to MongoDB, use raw BAML response
+          logAnalytics({
+            userMessage: message,
+            modals: aiResp.modals as any, // Store raw BAML response with nulls
+            lens: lens || 'none',
+            collector,
+            duration,
+            historyLength: history?.length || 0
+          }).catch(err => console.error("Analytics logging failed:", err))
+          
           return NextResponse.json(asResp)
         } else {
           console.log("⚠️  BAML response invalid or empty, falling back to heuristics")
@@ -244,9 +295,8 @@ export async function POST(req: Request) {
     }
 
     // Fallback heuristic
-    console.log("Using heuristic fallback")
-    const modals = await generateModalsHeuristically(message)
-    return NextResponse.json({ modals } satisfies AdamResponse)
+    console.log("Error, modals won't be generated")
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
   } catch (error) {
     console.error("/api/adam error", error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
