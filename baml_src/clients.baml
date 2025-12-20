@@ -23,6 +23,17 @@ client<llm> GEMINI_FLASH_2_5_LITE {
   }
 }
 
+client<llm> GEMINI_FLASH_3 {
+  provider "openai-generic"
+  retry_policy Constant
+  options {
+    base_url https://openrouter.ai/api/v1
+    api_key env.OPENROUTER_API_KEY
+    model "google/gemini-3-flash-preview"
+    max_tokens 16384
+  }
+}
+
 client<llm> CLAUDE_HAIKU_4_5 {
   provider "openai-generic"
   retry_policy Constant
@@ -33,13 +44,13 @@ client<llm> CLAUDE_HAIKU_4_5 {
   }
 }
 
-client<llm> GPT_4O_MINI {
+client<llm> GPT_OSS_120B {
   provider "openai-generic"
   retry_policy Constant
   options {
     base_url https://openrouter.ai/api/v1
     api_key env.OPENROUTER_API_KEY
-    model "openai/gpt-4o-mini"
+    model "openai/gpt-oss-120b"
     max_tokens 16384
   }
 }
@@ -55,11 +66,11 @@ client<llm> CLAUDE_SONNET {
   }
 }
 
-// Fallback strategy: try Flash 2.5 first, then GPT-4o-mini
+// Fallback strategy: try Flash 3 first, then GPT-OSS-120B
 client<llm> AdamFallback {
   provider fallback
   options {
-    strategy [GEMINI_FLASH_2_5, GPT_4O_MINI]
+    strategy [GEMINI_FLASH_3, GPT_OSS_120B]
   }
 }
 
