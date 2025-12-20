@@ -1,0 +1,291 @@
+/* Resume.module.css - LaTeX-style resume matching sb2nov/resume template */
+
+.resume {
+  font-family: "Times New Roman", Times, Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.15;
+  color: #000;
+  background: #fff;
+  padding: 0.5in;
+  max-width: 8.5in;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Header - centered name and contact */
+.header {
+  text-align: center;
+  margin-bottom: 6pt;
+}
+
+.name {
+  font-size: 26pt;
+  font-weight: normal;
+  font-variant: small-caps;
+  margin: 0 0 2pt 0;
+  letter-spacing: 1.5pt;
+}
+
+.contactInfo {
+  font-size: 10pt;
+  color: #000;
+  line-height: 1.4;
+}
+
+.contactInfo a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.separator {
+  color: #000;
+  margin: 0 3pt;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 8pt;
+}
+
+.sectionTitle {
+  font-size: 11pt;
+  font-weight: normal;
+  font-variant: small-caps;
+  text-transform: capitalize;
+  border-bottom: 0.8pt solid #000;
+  margin: 0 0 4pt 0;
+  padding-bottom: 1pt;
+  letter-spacing: 0.5pt;
+}
+
+/* Summary */
+.summary {
+  margin: 0;
+  text-align: justify;
+  font-size: 11pt;
+}
+
+/* Entry (Education, Experience, Projects) */
+.entry {
+  margin-bottom: 8pt;
+}
+
+/* Entry header with two-column layout */
+.entryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0;
+}
+
+.entryLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.entryRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Education specific - title row */
+.entryTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+}
+
+.entrySubheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+}
+
+/* Institution/Organization names */
+.institution {
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+.organization {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+/* Job/Position title */
+.title {
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+/* Location styling */
+.location {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+/* Dates styling */
+.dates {
+  font-style: italic;
+  font-size: 10pt;
+  white-space: nowrap;
+}
+
+/* Degree styling */
+.degree {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+.gpa {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+/* Advisor line */
+.advisors {
+  font-size: 10pt;
+  font-style: italic;
+}
+
+/* Bullets */
+.bullets {
+  margin: 2pt 0 0 15pt;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.bullets li {
+  margin-bottom: 1pt;
+  text-align: justify;
+  font-size: 10pt;
+  padding-left: 2pt;
+}
+
+.bullets li::marker {
+  font-size: 8pt;
+}
+
+/* Highlight bullet (for education) */
+.highlightBullet {
+  font-size: 10pt;
+  margin: 2pt 0 0 0;
+  padding-left: 15pt;
+}
+
+/* Publications */
+.publicationsList {
+  margin: 0;
+  padding-left: 15pt;
+}
+
+.publication {
+  margin-bottom: 4pt;
+  font-size: 10pt;
+  text-indent: -15pt;
+  padding-left: 0;
+}
+
+.pubNumber {
+  font-weight: bold;
+}
+
+.authors {
+  font-variant: normal;
+}
+
+.pubTitle {
+  margin-left: 0;
+}
+
+.venue {
+  font-style: italic;
+}
+
+.status {
+  font-style: normal;
+}
+
+.award {
+  font-weight: bold;
+}
+
+/* Skills - compact inline format */
+.skills {
+  margin: 0;
+  font-size: 10pt;
+}
+
+.skillRow {
+  margin-bottom: 2pt;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.skillCategory {
+  font-weight: bold;
+}
+
+.skillList {
+  margin-left: 4pt;
+}
+
+/* Multiple skill categories on same line */
+.skillsInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12pt;
+}
+
+/* Projects */
+.projectDescription {
+  margin: 2pt 0 0 0;
+  text-align: justify;
+  font-size: 10pt;
+}
+
+.technologies {
+  margin: 2pt 0 0 0;
+  font-size: 10pt;
+}
+
+/* Print styles */
+@media print {
+  .resume {
+    padding: 0.5in;
+    max-width: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .contactInfo a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  .section {
+    page-break-inside: avoid;
+  }
+
+  .entry {
+    page-break-inside: avoid;
+  }
+
+  .publication {
+    page-break-inside: avoid;
+  }
+}
+
+/* Dark mode container override (for preview in dark UI) */
+@media (prefers-color-scheme: dark) {
+  .resume {
+    background: #fff;
+    color: #000;
+  }
+}
