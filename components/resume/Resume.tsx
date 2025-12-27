@@ -10,6 +10,7 @@ import type {
   SkillCategory,
   ProjectItem,
 } from "@/types/resume"
+import "@/styles/fonts/computer-modern.css"
 import styles from "./Resume.module.css"
 
 interface ResumeProps {

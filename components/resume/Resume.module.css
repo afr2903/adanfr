@@ -1,8 +1,8 @@
-/* Resume.module.css - LaTeX-style resume matching sb2nov/resume template */
+/* Resume.module.css - LaTeX-style resume using New Computer Modern */
 
 .resume {
-  /* Use Palatino/Book Antiqua for thinner, more elegant serifs like Computer Modern */
-  font-family: "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman", serif;
+  /* New Computer Modern - the actual LaTeX font */
+  font-family: "New Computer Modern", "Latin Modern Roman", "Computer Modern", "Palatino Linotype", serif;
   font-size: 11pt;
   line-height: 1.2;
   color: #000;
@@ -50,7 +50,7 @@
 }
 
 .sectionTitle {
-  font-size: 10.5pt;
+  font-size: 11.5pt;
   font-weight: normal;
   font-variant: small-caps;
   text-transform: capitalize;
@@ -270,7 +270,7 @@
 
   .contactInfo a {
     color: #000;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   .section {
