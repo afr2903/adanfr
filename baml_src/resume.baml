@@ -87,70 +87,129 @@ function GenerateResume(
   user_messages: string,
   experiences_context: string,
   projects_context: string,
-  education_context: string
+  education_context: string,
+  lens: string
 ) -> GenerateResumeResponse {
-  client GEMINI_FLASH_3
+  client CLAUDE_OPUS_4_5
 
   prompt #"
-    <task>
-    Generate a tailored resume based on the conversation context and available portfolio data.
-    The resume should highlight the most relevant experiences, skills, and projects based on what the user has been asking about.
-    </task>
+Generate a tailored resume based on the conversation context and available portfolio data.
 
-    <user_conversation>
-    The user has been asking about:
-    {{ user_messages }}
-    </user_conversation>
+<system_goal>
+You are an expert career strategist and technical writer for Adán Flores Ramírez. Your goal is to generate a single-page, high-density resume tailored specifically to the user's current goal (Industry, Research, or Leadership). 
 
-    <available_experiences>
-    {{ experiences_context }}
-    </available_experiences>
+You must strictly adhere to Adán's writing style: **concise, metric-obsessed, and action-oriented.**
+</system_goal>
 
-    <available_projects>
-    {{ projects_context }}
-    </available_projects>
+<user_conversation>
+The user has been asking about:
+{{user_messages}}
+</user_conversation>
 
-    <available_education>
-    {{ education_context }}
-    </available_education>
+<viewpoint_lens>
+    {% if lens and lens != "none" %}
+    The visitor is viewing your portfolio through the {{ lens }} lens. Adjust section priority and bullet point framing:
+    
+    {% if lens == "recruiter" %}
+    // TARGET: Software Engineering, Startups, Industry Roles
+    - **Strategy:** Proven track record, ability to ship production code, revenue impact.
+    - **Section Order:** Experience (Top) -> Skills -> Projects -> Education.
+    - **Tone:** "I built this, it made this much money/saved this much time."
+    - **Highlight:** Riko MX (Founder), Pefai, Google.
+    
+    {% elif lens == "collaborator" %}
+    // TARGET: Hackathons, Open Source, Team Projects
+    - **Strategy:** Technical breadth, speed of execution, modern stack.
+    - **Section Order:** Experience -> Projects -> Skills -> Education.
+    - **Tone:** "I can build complex things quickly using X, Y, Z."
+    - **Highlight:** Riko MX, Catapulta, RoboCup.
+    
+    {% elif lens == "researcher" %}
+    // TARGET: PhD programs, Research Labs, Academic Grants
+    - **Strategy:** Scientific rigor, novelty, publications, methodologies.
+    - **Section Order:** Education (Top) -> Research Experience -> Publications -> Skills.
+    - **Tone:** "First author," "Novel architecture," "Statistically significant improvement."
+    - **Highlight:** MIT Device Realization Lab, RoBorregos Research, MICAI/IEEE papers.
+    - **Note:** Rename "Experience" to "Research Experience" if the content is primarily academic.
+    
+    {% elif lens == "founder" %}
+    // TARGET: VCs, Leadership Roles, Scholarships (e.g., KHS)
+    - **Strategy:** Leadership, vision, resource management, prestige.
+    - **Section Order:** Education (Top - highlight Awards/GPA) -> Experience (Leadership focused) -> Leadership/Service -> Projects.
+    - **Tone:** "Led team of X," "Raised $K," "Directed strategy."
+    - **Highlight:** Riko MX, RoBorregos Team Leader, Borrego de Oro Award.
+    {% endif %}
+    
+    {% else %}
+    // DEFAULT LENS
+    - **Strategy:** Balanced profile showing Engineering + Research + Leadership.
+    - **Section Order:** Education -> Experience -> Skills -> Projects.
+    {% endif %}
+</viewpoint_lens>
 
-    <resume_guidelines>
-    0. CONTACT: It's already filled out by the external system.
-    1. SUMMARY (optional): Almost NEVER use this. Only if the conversation reveals a specific role or interest, write a 2-3 sentence summary tailored to that context.
+<style_guide>
+    1. **The "XYZ" Bullet Formula:** Every bullet point must follow this structure: "Accomplished [X] as measured by [Y], by doing [Z]."
+       - *Bad:* "Worked on a voice agent for restaurants."
+       - *Good:* "Engineered speech pipeline with < 2s latency (X) and 95% order accuracy (Y) by implementing prompt-optimization and concurrent execution (Z)."
+    
+    2. **Metrics Over Description:** Never describe *what* the project is. Describe *the impact* of the project.
+       - Use specific numbers: "$8K MRR," "40% reduction," "96.5% success rate," "3-person team."
+    
+    3. **Action Verbs:** Start every bullet with a power verb.
+       - *Engineering:* Engineered, Architected, Optimized, Refactored, Deployed.
+       - *Research:* Authored, Synthesized, Validated, Fine-tuned, Benchmarked.
+       - *Leadership:* Directed, Spearheaded, Mentored, Negotiated.
+    
+    4. **Density:** No fluff. No filler words. Remove "successfully," "helped to," "responsible for." Maximize information per line.
+</style_guide>
 
-    2. SECTIONS ORDER: Order sections by relevance to the conversation:
-       - For technical roles: Experience -> Skills -> Projects -> Education
-       - For academic/research: Education -> Publications -> Research Experience -> Skills
-       - Default: Education -> Experience -> Skills -> Projects
+<available_experiences>
+{{ experiences_context }}
+</available_experiences>
 
-    3. EXPERIENCE SELECTION:
-       - Select 2-4 most relevant experiences based on conversation context
-       - Write 3-5 bullet points per role
-       - Use strong action verbs (Led, Built, Designed, Implemented, Reduced, Improved)
-       - Include metrics and quantifiable results when available
-       - Tailor bullet points to emphasize skills relevant to the conversation
+<available_projects>
+{{ projects_context }}
+</available_projects>
 
-    4. SKILLS:
-       - Group by category (Languages, Frameworks, Tools, etc.)
-       - Prioritize skills mentioned in the conversation
-       - Include 3-5 skills per category
+<available_education>
+{{ education_context }}
+</available_education>
 
-    5. PROJECTS (if relevant):
-       - Include 2-3 projects most relevant to the conversation
-       - Brief descriptions with key technologies
+<few_shot_examples>
+    // EXAMPLE 1: Transformation for "Founding Engineer" (Industry Lens)
+    Input: "Building AI voice agents for restaurants... $110K pre-seed... handling 30+ daily customer interactions."
+    Output Bullet: "Lead 3-person team building AI voice agents enabling Mexican restaurants to take direct orders. $8K MRR, $110K raised at $4M valuation. 80+ daily customer interactions."
+    Output Bullet: "Engineered speech pipeline with < 2s latency, 95%+ order accuracy, and prompt-optimized (40% fewer tokens)."
 
-    6. PUBLICATIONS (if relevant to research/academic contexts):
-       - Include if user asked about research or academic work
+    // EXAMPLE 2: Transformation for "MIT Research" (Research Lens)
+    Input: "Proposed framework synthesizing VR, AI... 29% production improvement... 36% waste reduction."
+    Output Bullet: "1st author on VR+ML+LLM framework for manufacturing education achieving 43.9% throughput increase and 43.6% scrap reduction in simulation. Under review at Taylor & Francis."
+    
+    // EXAMPLE 3: Transformation for "Google" (Software Lens)
+    Input: "Built data synchronization components... Reduced computational resources... by 40%."
+    Output Bullet: "Optimized C++ data infrastructure components and implemented SQL testing, improving scalability for clients."
+</few_shot_examples>
 
-    7. FORMATTING:
-       - Keep it concise (should fit on 1-2 pages when rendered)
-       - Use consistent date formats (e.g., "Jun. 2024 - Present")
-       - Be specific with achievements, not generic
+<resume_guidelines>
+    0. **CONTACT:** Managed externally.
+    
+    1. **SUMMARY:** STRICTLY FORBIDDEN unless the user explicitly asks for a "Bio" or "Summary."
+    
+    2. **SECTIONS:**
+       - Select strictly the top 3-4 most relevant blocks (Experience + Projects combined) to ensure one-page fit.
+       - If `lens == "researcher"`, you MUST include a "Research & Publications" section separate from Experience.
+    
+    3. **AWARDS LOGIC:**
+       - If the award is prestigious (e.g., Borrego de Oro, Best Paper), include it within the **Education** object highlights OR creates a small **Awards** section at the bottom. Do not bury it in generic bullets.
+       
+    4. **FORMATTING:**
+       - Use "Jan. 2025" format.
+       - If a role is "Current", use "Present".
+       - Group skills logically (Languages, ML/AI, Systems).
+</resume_guidelines>
 
-    </resume_guidelines>
+Generate a JSON resume following the ResumeData schema.
 
-    Generate a JSON resume following the ResumeData schema.
-
-    {{ ctx.output_format }}
+{{ ctx.output_format }}
   "#
 }
