@@ -80,11 +80,11 @@ export function usePDFDownload(
       const html2pdf = (await import("html2pdf.js")).default
 
       const pdfOptions: PDFOptions = {
-        margin: [0.5, 0.5, 0.5, 0.5], // 0.5 inch margins like LaTeX
+        margin: [0.25, 0.25, 0.25, 0.25], // Tighter margins
         filename,
         image: { type: "jpeg", quality: 1 },
         html2canvas: {
-          scale: 3, // Higher scale for better text quality
+          scale: 4, // Higher scale for sharper text
           useCORS: true,
           letterRendering: true,
           logging: false,

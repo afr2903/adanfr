@@ -1,15 +1,18 @@
 /* Resume.module.css - LaTeX-style resume matching sb2nov/resume template */
 
 .resume {
-  font-family: "Times New Roman", Times, Georgia, serif;
+  /* Use Palatino/Book Antiqua for thinner, more elegant serifs like Computer Modern */
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman", serif;
   font-size: 11pt;
-  line-height: 1.15;
+  line-height: 1.2;
   color: #000;
   background: #fff;
-  padding: 0.5in;
+  padding: 0.4in 0.5in;
   max-width: 8.5in;
   margin: 0 auto;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Header - centered name and contact */
@@ -19,11 +22,10 @@
 }
 
 .name {
-  font-size: 26pt;
-  font-weight: normal;
-  font-variant: small-caps;
-  margin: 0 0 2pt 0;
-  letter-spacing: 1.5pt;
+  font-size: 24pt;
+  font-weight: 700;
+  margin: 0 0 3pt 0;
+  letter-spacing: 0.5pt;
 }
 
 .contactInfo {
@@ -48,14 +50,14 @@
 }
 
 .sectionTitle {
-  font-size: 11pt;
+  font-size: 10.5pt;
   font-weight: normal;
   font-variant: small-caps;
   text-transform: capitalize;
-  border-bottom: 0.8pt solid #000;
-  margin: 0 0 4pt 0;
-  padding-bottom: 1pt;
-  letter-spacing: 0.5pt;
+  border-bottom: 0.5pt solid #000;
+  margin: 0 0 6pt 0;
+  padding-bottom: 3pt;
+  letter-spacing: 0.8pt;
 }
 
 /* Summary */
@@ -156,20 +158,22 @@
 
 /* Bullets */
 .bullets {
-  margin: 2pt 0 0 15pt;
-  padding: 0;
+  margin: 1pt 0 0 0;
+  padding: 0 0 0 15pt;
   list-style-type: disc;
+  list-style-position: outside;
 }
 
 .bullets li {
-  margin-bottom: 1pt;
+  margin-bottom: 0;
   text-align: justify;
   font-size: 10pt;
-  padding-left: 2pt;
+  padding-left: 0;
+  line-height: 1.25;
 }
 
 .bullets li::marker {
-  font-size: 8pt;
+  font-size: 6pt;
 }
 
 /* Highlight bullet (for education) */
@@ -258,7 +262,7 @@
 /* Print styles */
 @media print {
   .resume {
-    padding: 0.5in;
+    padding: 0.4in 0.5in;
     max-width: none;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

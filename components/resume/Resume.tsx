@@ -37,7 +37,7 @@ const Resume = forwardRef<HTMLDivElement, ResumeProps>(({ data }, ref) => {
               <span key={i}>
                 {item?.includes("@") ? (
                   <a href={`mailto:${item}`}>{item}</a>
-                ) : item?.includes("linkedin") || item?.includes("github") || item?.includes("http") ? (
+                ) : item?.includes("linkedin") || item?.includes("github") || item?.includes("http") || item?.includes(".com") ? (
                   <a href={item?.startsWith("http") ? item : `https://${item}`} target="_blank" rel="noreferrer">
                     {item?.replace(/^https?:\/\//, "")}
                   </a>

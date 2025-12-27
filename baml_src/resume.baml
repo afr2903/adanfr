@@ -1,15 +1,5 @@
 // BAML file for generating dynamic resumes based on conversation context
 
-class ResumeContact {
-  name string @description("Full name")
-  phone string? @description("Phone number")
-  email string? @description("Email address")
-  linkedin string? @description("LinkedIn profile URL or username")
-  github string? @description("GitHub profile URL or username")
-  website string? @description("Personal website URL")
-  location string? @description("City, State or Location")
-}
-
 class EducationItem {
   institution string @description("University or institution name")
   location string? @description("City, State or Country")
@@ -85,7 +75,6 @@ class ResumeSection {
 }
 
 class ResumeData {
-  contact ResumeContact @description("Contact information header")
   summary string? @description("Optional 2-3 sentence professional summary tailored to the conversation context")
   sections ResumeSection[] @description("Resume sections ordered by relevance. Include: education, experience (most relevant 2-4 roles), skills, and optionally projects/publications if relevant.")
 }
@@ -100,23 +89,13 @@ function GenerateResume(
   projects_context: string,
   education_context: string
 ) -> GenerateResumeResponse {
-  client GEMINI_FLASH_2_5
+  client GEMINI_FLASH_3
 
   prompt #"
     <task>
     Generate a tailored resume based on the conversation context and available portfolio data.
     The resume should highlight the most relevant experiences, skills, and projects based on what the user has been asking about.
     </task>
-
-    <contact_info>
-    Name: Adan Flores Ramirez
-    Phone: +1 (408) 312-1647
-    Email: adan.flores.ramirez@outlook.com
-    LinkedIn: linkedin.com/in/afr2903
-    GitHub: github.com/afr2903
-    Website: adanfr.me
-    Location: Monterrey, Mexico
-    </contact_info>
 
     <user_conversation>
     The user has been asking about:
@@ -136,35 +115,34 @@ function GenerateResume(
     </available_education>
 
     <resume_guidelines>
-    1. CONTACT: Use the contact info provided above.
+    0. CONTACT: It's already filled out by the external system.
+    1. SUMMARY (optional): Almost NEVER use this. Only if the conversation reveals a specific role or interest, write a 2-3 sentence summary tailored to that context.
 
-    2. SUMMARY (optional): If the conversation reveals a specific role or interest, write a 2-3 sentence summary tailored to that context.
-
-    3. SECTIONS ORDER: Order sections by relevance to the conversation:
+    2. SECTIONS ORDER: Order sections by relevance to the conversation:
        - For technical roles: Experience -> Skills -> Projects -> Education
        - For academic/research: Education -> Publications -> Research Experience -> Skills
        - Default: Education -> Experience -> Skills -> Projects
 
-    4. EXPERIENCE SELECTION:
+    3. EXPERIENCE SELECTION:
        - Select 2-4 most relevant experiences based on conversation context
        - Write 3-5 bullet points per role
        - Use strong action verbs (Led, Built, Designed, Implemented, Reduced, Improved)
        - Include metrics and quantifiable results when available
        - Tailor bullet points to emphasize skills relevant to the conversation
 
-    5. SKILLS:
+    4. SKILLS:
        - Group by category (Languages, Frameworks, Tools, etc.)
        - Prioritize skills mentioned in the conversation
        - Include 3-5 skills per category
 
-    6. PROJECTS (if relevant):
+    5. PROJECTS (if relevant):
        - Include 2-3 projects most relevant to the conversation
        - Brief descriptions with key technologies
 
-    7. PUBLICATIONS (if relevant to research/academic contexts):
+    6. PUBLICATIONS (if relevant to research/academic contexts):
        - Include if user asked about research or academic work
 
-    8. FORMATTING:
+    7. FORMATTING:
        - Keep it concise (should fit on 1-2 pages when rendered)
        - Use consistent date formats (e.g., "Jun. 2024 - Present")
        - Be specific with achievements, not generic
