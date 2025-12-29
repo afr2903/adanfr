@@ -34,6 +34,34 @@ interface UsePDFDownloadReturn {
   error: Error | null
 }
 
+// Font-face declarations for New Computer Modern
+const getFontFaces = () => `
+  @font-face {
+    font-family: "New Computer Modern";
+    src: url("/fonts/NewCM10-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "New Computer Modern";
+    src: url("/fonts/NewCM10-Italic.otf") format("opentype");
+    font-weight: 400;
+    font-style: italic;
+  }
+  @font-face {
+    font-family: "New Computer Modern";
+    src: url("/fonts/NewCM10-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "New Computer Modern";
+    src: url("/fonts/NewCM10-BoldItalic.otf") format("opentype");
+    font-weight: 700;
+    font-style: italic;
+  }
+`
+
 // CSS styles for print/PDF that match the LaTeX styling
 const getPrintStyles = () => `
   @page {
@@ -49,7 +77,7 @@ const getPrintStyles = () => `
   body {
     margin: 0;
     padding: 0;
-    font-family: "Times New Roman", Times, Georgia, serif;
+    font-family: "New Computer Modern", "Palatino Linotype", serif;
     -webkit-font-smoothing: antialiased;
   }
 `
@@ -80,11 +108,11 @@ export function usePDFDownload(
       const html2pdf = (await import("html2pdf.js")).default
 
       const pdfOptions: PDFOptions = {
-        margin: [0.5, 0.5, 0.5, 0.5], // 0.5 inch margins like LaTeX
+        margin: [0.25, 0.25, 0.25, 0.25], // Tighter margins
         filename,
         image: { type: "jpeg", quality: 1 },
         html2canvas: {
-          scale: 3, // Higher scale for better text quality
+          scale: 4, // Higher scale for sharper text
           useCORS: true,
           letterRendering: true,
           logging: false,
@@ -148,6 +176,7 @@ export function usePDFDownload(
         <head>
           <title>${filename.replace(".pdf", "")}</title>
           <style>
+            ${getFontFaces()}
             ${getPrintStyles()}
             ${styleSheets}
           </style>

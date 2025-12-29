@@ -12,13 +12,13 @@ function generateFallbackResume(userMessages: string[]): ResumeData {
 
   return {
     contact: {
-      name: "Adan Flores Ramirez",
+      name: "Adán Flores Ramírez",
       phone: "+1 (408) 312-1647",
-      email: "adan.flores.ramirez@outlook.com",
+      email: "afr102903@gmail.com",
       linkedin: "linkedin.com/in/afr2903",
       github: "github.com/afr2903",
-      website: "adanfr.me",
-      location: "Monterrey, Mexico",
+      website: "adanfr.com",
+      location: "San Luis Potosí, Mexico",
     },
     summary: userMessages.length > 0
       ? `Software engineer with experience in robotics, AI, and full-stack development. Seeking opportunities aligned with: ${userMessages.slice(-1)[0].substring(0, 100)}...`
@@ -154,13 +154,13 @@ function transformBAMLResponse(bamlResponse: any): ResumeData {
 
   return {
     contact: {
-      name: resume.contact.name,
-      phone: resume.contact.phone,
-      email: resume.contact.email,
-      linkedin: resume.contact.linkedin,
-      github: resume.contact.github,
-      website: resume.contact.website,
-      location: resume.contact.location,
+      name: "Adán Flores Ramírez",
+      phone: "+1 (408) 312-1647",
+      email: "afr102903@gmail.com",
+      linkedin: "linkedin.com/in/adanfr",
+      github: "github.com/afr2903",
+      website: "adanfr.com",
+      location: "San Luis Potosí, Mexico",
     },
     summary: resume.summary,
     sections: transformedSections,
@@ -168,9 +168,9 @@ function transformBAMLResponse(bamlResponse: any): ResumeData {
 }
 
 export async function POST(req: Request) {
-  return NextResponse.json({ error: "Resume generation temporarily disabled" }, { status: 503 })  // COMING SOON
+  // return NextResponse.json({ error: "Resume generation temporarily disabled" }, { status: 503 })  // COMING SOON
   try {
-    const { userMessages } = (await req.json()) as { userMessages?: string[] }
+    const { userMessages, lens } = (await req.json()) as { userMessages?: string[]; lens?: string }
 
     if (!userMessages || !Array.isArray(userMessages)) {
       return NextResponse.json({ error: "Invalid request - userMessages required" }, { status: 400 })
@@ -237,7 +237,8 @@ export async function POST(req: Request) {
           userMessagesContext,
           experiencesContext,
           projectsContext,
-          educationContext
+          educationContext,
+          lens || "none"
         )
 
         const duration = Date.now() - startTime
