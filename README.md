@@ -1,3 +1,11 @@
+<p align="center">
+  <picture>
+    <img alt="Adam character (my alter ego)" src="https://adanfr.com/images/adam.png" width="150" height="150" style="max-width: 100%;">
+  </picture>
+  <br/>
+  <br/>
+</p>
+
 # Portfolio with AI Virtual Twin
 
 Personal portfolio with an LLM-powered interface ("Adam") that answers questions about professional experience using structured outputs.
