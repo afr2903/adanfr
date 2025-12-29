@@ -113,7 +113,7 @@ The user has been asking about:
     {% if lens == "recruiter" %}
     // TARGET: Software Engineering, Startups, Industry Roles
     - **Strategy:** Proven track record, ability to ship production code, revenue impact.
-    - **Section Order:** Experience (Top) -> Skills -> Projects -> Education.
+    - **Section Order:** Education (Top but brief) -> Experience (Top) -> Projects -> Skills.
     - **Tone:** "I built this, it made this much money/saved this much time."
     - **Highlight:** Riko MX (Founder), Pefai, Google.
     
@@ -135,7 +135,7 @@ The user has been asking about:
     {% elif lens == "founder" %}
     // TARGET: VCs, Leadership Roles, Scholarships (e.g., KHS)
     - **Strategy:** Leadership, vision, resource management, prestige.
-    - **Section Order:** Education (Top - highlight Awards/GPA) -> Experience (Leadership focused) -> Leadership/Service -> Projects.
+    - **Section Order:** Education (Top but brief) -> Experience (Leadership focused) -> Leadership/Service -> Projects.
     - **Tone:** "Led team of X," "Raised $K," "Directed strategy."
     - **Highlight:** Riko MX, RoBorregos Team Leader, Borrego de Oro Award.
     {% endif %}
@@ -161,6 +161,8 @@ The user has been asking about:
        - *Leadership:* Directed, Spearheaded, Mentored, Negotiated.
     
     4. **Density:** No fluff. No filler words. Remove "successfully," "helped to," "responsible for." Maximize information per line.
+
+    5. Identify if education is relevant, almost always include just the B.S. briefly. Certifications most of the time are not relevant.
 </style_guide>
 
 <available_experiences>
@@ -176,16 +178,166 @@ The user has been asking about:
 </available_education>
 
 <few_shot_examples>
-    // EXAMPLE 1: Transformation for "Founding Engineer" (Industry Lens)
+    // FULL EXAMPLE with job description
+    Job Description: "Open-Source Machine Learning Engineer - International Remote
+Description
+At Hugging Face, were on a journey to democratize good AI. We are building the fastest growing platform for AI builders with over 5 million users & 100k organizations who collectively shared over 1M models, 300k datasets & 300k apps. Our open-source libraries have more than 400k+ stars on Github.
+About the Role
+As an open-source Machine Learning Engineer, you will work to improve the open-source machine learning ecosystem. You will mainly work with existing open-source libraries, such as Transformers, Datasets, or Accelerate, and you will interact with users and contributors of the broad open-source machine learning ecosystem. We'll brainstorm with you to put you in a position to do the work that interests you and that is impactful.
+You'll get to foster one of the most active machine learning communities, helping users contribute to and use the tools that you build. You'll interact with Researchers, ML practitioners and data scientists on a daily basis through GitHub, our forums, or slack.
+About you
+If you love open-source, are passionate about making complex technology more accessible, and want to contribute to one of the fastest-growing ML ecosystems, then we can't wait to see your application!
+If you're interested in joining us, but don't tick every box above, we still encourage you to apply! We're building a diverse team whose skills, experiences, and background complement one another. We're happy to consider where you might be able to make the biggest impact."
+    Output resume:
+```
+{
+  "summary": null,
+  "sections": [
+    {
+      "type": "education",
+      "title": "EDUCATION",
+      "items": [
+        {
+          "institution": "Instituto Tecnológico y de Estudios Superiores de Monterrey",
+          "location": "Monterrey, N.L., Mexico",
+          "degree": "B.S. Mechatronics Engineering",
+          "dates": "Aug. 2021 - Jun. 2025",
+          "gpa": "96/100",
+          "highlights": [
+            "Leadership in Professional Development Award",
+            "Linux Foundation Scholarship recipient, PyTorch Conference 2025"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "experience",
+      "title": "WORK EXPERIENCE",
+      "items": [
+        {
+          "title": "Founding Engineer",
+          "dates": "July 2025 - Present",
+          "organization": "Riko MX",
+          "location": "San Francisco, CA / Monterrey, N.L., Mexico",
+          "bullets": [
+            "Lead 3-person team building AI voice agents enabling Mexican restaurants to take direct orders, reclaiming ownership from delivery platforms charging 30% commissions. $8K MRR, $110K raised at $4M valuation.",
+            "Engineered conversational speech pipeline handling 50+ daily customer interactions, under $2 MXN/minute, and with 95% order accuracy, by implementing a modular architecture with a data flywheel in Python/LiveKit."
+          ]
+        },
+        {
+          "title": "AI Engineer",
+          "dates": "Jan. 2025 - Sep. 2025",
+          "organization": "Pefai",
+          "location": "Mexico City, Mexico",
+          "bullets": [
+            "Led 3-person team building multi-agent AI system. Achieved 20% faster generation through concurrent execution and type-safe outputs; improved accuracy 30% via semantic-based custom quality evaluation framework."
+          ]
+        },
+        {
+          "title": "Undergraduate Research Assistant",
+          "dates": "Sep. 2024 - Dec. 2024",
+          "organization": "MIT Device Realization Lab",
+          "location": "Cambridge, MA",
+          "bullets": [
+            "1st author on VR+ML+LLM framework for manufacturing education achieving 28.6% throughput increase and 35.4% scrap reduction in simulation. Under review at Taylor & Francis.",
+            "Refactored entire FrED Factory codebase, establishing new standard repository now used by all lab researchers."
+          ]
+        },
+        {
+          "title": "Software Engineer Intern",
+          "dates": "June 2024 - Sep. 2024",
+          "organization": "Google Cloud AI & Industry solutions",
+          "location": "Sunnyvale, CA",
+          "bullets": [
+            "Optimized resource consumption for data ingestion processes by refining critical C++ components and implementing rigorous SQL-based end-to-end testing, leading to a more scalable and reliable data infrastructure."
+          ]
+        },
+        {
+          "title": "Unity Developer",
+          "dates": "Nov. 2020 - Feb. 2024",
+          "organization": "Irmatix Robotics Catapulta Academy",
+          "location": "Remote",
+          "bullets": [
+            "Democratized STEM education for under-resourced Mexican schools with web-based gamified learning platform."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "projects",
+      "title": "PROJECTS & RESEARCH",
+      "items": [
+        {
+          "title": "MICAI 2025 (Springer LNAI) | Natural Language Processing, LLMs, LH Task Planning",
+          "dates": "June - Nov. 2025",
+          "organization": null,
+          "description": "1st author: Taming the LLM: Reliable Task Planning for Robotics using Parsing and Grounding. Open-source fine-tuned 8B model achieved 96.5% success vs. cloud APIs (90.4%) in long-horizon task planning for robotics; pipeline publicly available and in HF Spaces. 2nd Best Student Paper Award. Published.",
+          "technologies": []
+        },
+        {
+          "title": "RoboCup @HOME Competition",
+          "dates": "Nov. 2022 - May 2025",
+          "organization": null,
+          "description": "Led the development and deployment of an autonomous service robot for elderly/disabled with 4 software areas: computer vision, HRI, manipulation and navigation, 6th place international. 1st author: Software Toolkit for RoboCup@Home (ICRCA 2026). Open-source modular architecture for service robots, validated in real-world competition conditions. Under Review.",
+          "technologies": [
+            "C++",
+            "Python",
+            "ROS"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "skills",
+      "title": "TECHNICAL SKILLS",
+      "items": [
+        {
+          "category": "Languages",
+          "skills": [
+            "Python",
+            "C++",
+            "Bash",
+            "Go",
+            "SQL",
+            "Rust"
+          ]
+        },
+        {
+          "category": "ML/AI",
+          "skills": [
+            "PyTorch",
+            "Transformers",
+            "LangChain",
+            "OpenCV",
+            "LiveKit"
+          ]
+        },
+        {
+          "category": "Systems",
+          "skills": [
+            "ROS/ROS2",
+            "Docker",
+            "Linux",
+            "Git",
+            "FastAPI"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+    // BULLET EXAMPLE 1: Transformation for "Founding Engineer" (Industry Lens)
     Input: "Building AI voice agents for restaurants... $110K pre-seed... handling 30+ daily customer interactions."
     Output Bullet: "Lead 3-person team building AI voice agents enabling Mexican restaurants to take direct orders. $8K MRR, $110K raised at $4M valuation. 80+ daily customer interactions."
     Output Bullet: "Engineered speech pipeline with < 2s latency, 95%+ order accuracy, and prompt-optimized (40% fewer tokens)."
 
-    // EXAMPLE 2: Transformation for "MIT Research" (Research Lens)
+    // BULLET EXAMPLE 2: Transformation for "MIT Research" (Research Lens)
     Input: "Proposed framework synthesizing VR, AI... 29% production improvement... 36% waste reduction."
     Output Bullet: "1st author on VR+ML+LLM framework for manufacturing education achieving 43.9% throughput increase and 43.6% scrap reduction in simulation. Under review at Taylor & Francis."
     
-    // EXAMPLE 3: Transformation for "Google" (Software Lens)
+    // BULLET EXAMPLE 3: Transformation for "Google" (Software Lens)
     Input: "Built data synchronization components... Reduced computational resources... by 40%."
     Output Bullet: "Optimized C++ data infrastructure components and implemented SQL testing, improving scalability for clients."
 </few_shot_examples>
@@ -197,6 +349,7 @@ The user has been asking about:
     
     2. **SECTIONS:**
        - Select strictly the top 3-4 most relevant blocks (Experience + Projects combined) to ensure one-page fit.
+       - ENSURE ONE PAGE FIT. For reference, a bullet point at 115 characters is approximately 1 line of text. Think visually given this measurement.
        - If `lens == "researcher"`, you MUST include a "Research & Publications" section separate from Experience.
     
     3. **AWARDS LOGIC:**
