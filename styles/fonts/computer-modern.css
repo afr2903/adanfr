@@ -1,0 +1,36 @@
+/* New Computer Modern Font Family
+ * Source: https://ctan.org/pkg/newcomputermodern
+ * A modern Unicode version of Computer Modern, the classic LaTeX font
+ */
+
+@font-face {
+  font-family: "New Computer Modern";
+  src: url("/fonts/NewCM10-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  src: url("/fonts/NewCM10-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  src: url("/fonts/NewCM10-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New Computer Modern";
+  src: url("/fonts/NewCM10-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}

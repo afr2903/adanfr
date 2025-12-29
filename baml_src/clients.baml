@@ -55,13 +55,13 @@ client<llm> GPT_OSS_120B {
   }
 }
 
-client<llm> CLAUDE_SONNET {
+client<llm> CLAUDE_OPUS_4_5 {
   provider "openai-generic"
   retry_policy Constant
   options {
     base_url https://openrouter.ai/api/v1
     api_key env.OPENROUTER_API_KEY
-    model "anthropic/claude-sonnet-4"
+    model "anthropic/claude-opus-4.5"
     max_tokens 16384
   }
 }

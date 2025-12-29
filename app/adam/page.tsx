@@ -301,7 +301,7 @@ export default function ChatPage() {
       const res = await fetch("/api/resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessages }),
+        body: JSON.stringify({ userMessages, lens: activeLens }),
       })
 
       const data = await res.json()
@@ -508,7 +508,7 @@ export default function ChatPage() {
               <div className="relative z-10">
                 <div className="flex items-center justify-between gap-4 mb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>(WIP) Custom Resume</h3>
+                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>Custom Resume</h3>
                     <p className="text-xs text-white/50 mt-1">
                       {conversationHistory.filter(e => e.role === 'user').length === 0
                         ? "Send a message to enable generation"
