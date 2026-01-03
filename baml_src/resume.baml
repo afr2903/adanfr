@@ -178,7 +178,172 @@ The user has been asking about:
 </available_education>
 
 <few_shot_examples>
-    // FULL EXAMPLE with job description
+    // FULL EXAMPLE with job description 1
+Job Description "Forward Deployed Engineer - HappyRobot"
+We are looking for a versatile and highly skilled Forward Deployed Engineer based in Mexico to join our team. In this role, you will combine strong technical abilities with excellent communication skills, working directly with customers to ensure they maximize the value of HappyRobot’s AI platform. You will be involved in onboarding, implementation, and ongoing support, while also contributing to product development and innovation.
+What You’ll Do
+Customer-Facing Engineering – Work closely with customers from onboarding to ongoing usage, helping them integrate and optimize our AI solutions.
+Technical Development – Build new features, MVPs, and scalable solutions that directly impact customer outcomes.
+Full-Stack Development – Utilize React, TypeScript, Node.js, and Python to develop robust applications and tools.
+AI/ML Applications – Design, implement, and iterate on AI/ML solutions, including LLM prompting, tuning of voices, and transcribers to optimize use cases.
+Integration & APIs – Manage APIs and integrations with third-party systems to ensure seamless functionality for customers.
+Cross-Functional Collaboration – Partner with Product, Engineering, and Customer Success teams to deliver tailored solutions.
+Iterative Problem-Solving – Continuously iterate and improve AI solutions based on customer feedback and evolving requirements.
+Project Management – Prioritize and manage multiple projects under tight deadlines while maintaining high-quality results.
+Must Have
+Strong full-stack experience: React, TypeScript, Node.js.
+Hands-on proficiency in Python.
+Experience building AI/ML applications, including LLM prompting and tuning.
+Ability to manage APIs and integrate with third-party systems.
+Excellent communication skills with the ability to explain technical concepts to non-technical stakeholders.
+Proven ability to prioritize and manage multiple projects under tight deadlines.
+Founder mindset: highly independent, takes ownership, and thrives in a fast-paced environment.
+Output resume:
+```
+{
+  "summary": null,
+  "sections": [
+    {
+      "type": "education",
+      "title": "Education",
+      "items": [
+        {
+          "institution": "Instituto Tecnológico y de Estudios Superiores de Monterrey",
+          "location": "Monterrey, N.L., Mexico",
+          "degree": "B.S. Mechatronics Engineering",
+          "dates": "Aug. 2021 - Jun. 2025",
+          "gpa": "96/100",
+          "highlights": [
+            "Leadership in Professional Development Award ('Borrego de Oro')"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "experience",
+      "title": "Work Experience",
+      "items": [
+        {
+          "title": "Founding Engineer",
+          "dates": "July 2025 - Present",
+          "organization": "Riko MX",
+          "location": "Monterrey, Mexico",
+          "bullets": [
+            "Lead 3-person team building AI voice agents enabling Mexican restaurants to reclaim ownership from delivery platforms charging 30% commissions.",
+            "$8K MRR, $110K raised at $4M valuation.",
+            "Engineered real-time conversational speech pipeline handling 50+ daily customer interactions in Spanish with sub-second latency, 95% order accuracy, and costs under $2 MXN/minute using Python/LiveKit/FastAPI.",
+            "Designed modular architecture enabling non-technical restaurant owners to customize agent interactions through HCI-driven iterative development: user research, prototyping, and hypothesis testing."
+          ]
+        },
+        {
+          "title": "AI Engineer",
+          "dates": "Jan. 2025 - Sep. 2025",
+          "organization": "Pefai",
+          "location": "Mexico City, Mexico",
+          "bullets": [
+            "Led 3-person team building AI-powered product design platform from scratch.",
+            "Achieved 30% accuracy improvement through prompt architecture and structured output validation layers.",
+            "Established quality measurement frameworks enabling objective performance tracking across model iterations.",
+            "Shipped production AI with robust error handling and testing infrastructure."
+          ]
+        },
+        {
+          "title": "Software Engineer Intern",
+          "dates": "June 2024 - Sep. 2024",
+          "organization": "Google Cloud AI & Industry Solutions",
+          "location": "Sunnyvale, CA",
+          "bullets": [
+            "Built data synchronization components for Vertex AI platform serving enterprise ML workloads.",
+            "Reduced computational resources by 40% through algorithm optimization in C++.",
+            "Designed comprehensive testing infrastructure ensuring reliability during major platform migration; learned rigorous code review culture and cross-timezone collaboration."
+          ]
+        },
+        {
+          "title": "Unity Developer",
+          "dates": "Nov. 2020 - Feb. 2024",
+          "organization": "Ixmatix Robotics - Catapulta Academy",
+          "location": "Remote",
+          "bullets": [
+            "Reduced game loading time by 80% through optimization, enabling deployment on older computers in Mexican public schools.",
+            "Later developed real-time voice assistant achieving 25% latency reduction."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "projects",
+      "title": "Projects & Research",
+      "items": [
+        {
+          "title": "Reliable Task Planning for Robotics | MICAI 2025 (Springer LNAI)",
+          "dates": "May - Nov. 2025",
+          "organization": null,
+          "description": "1st author. Open-source fine-tuned 8B LLM achieved 96.5% success rate on long-horizon task planning vs. cloud APIs (90.4%); schema-aligned parser 11% more dependable than standard methods. 2nd Best Student Paper Award.",
+          "technologies": [
+            "Python",
+            "PyTorch",
+            "BAML",
+            "RAG",
+            "LLMs"
+          ]
+        },
+        {
+          "title": "Immersive Cognitive Factory Twin",
+          "dates": "Sep. 2024 - May 2025",
+          "organization": "MIT Device Realization Lab",
+          "description": "1st author. VR+ML+LLM framework for manufacturing education achieving 29% throughput improvement and 36% waste reduction in simulation. Under review at Taylor & Francis.",
+          "technologies": [
+            "Unity",
+            "Neural Networks",
+            "LLMs",
+            "Python"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "skills",
+      "title": "Technical Skills",
+      "items": [
+        {
+          "category": "Languages",
+          "skills": [
+            "Python",
+            "TypeScript",
+            "Node.js",
+            "C++",
+            "Go",
+            "SQL"
+          ]
+        },
+        {
+          "category": "ML/AI",
+          "skills": [
+            "PyTorch",
+            "LLMs",
+            "LiveKit",
+            "FastAPI",
+            "Transformers",
+            "BAML"
+          ]
+        },
+        {
+          "category": "Systems",
+          "skills": [
+            "React",
+            "Docker",
+            "Linux",
+            "Git",
+            "CI/CD",
+            "REST APIs"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+    // FULL EXAMPLE with job description 2
     Job Description: "Open-Source Machine Learning Engineer - International Remote
 Description
 At Hugging Face, were on a journey to democratize good AI. We are building the fastest growing platform for AI builders with over 5 million users & 100k organizations who collectively shared over 1M models, 300k datasets & 300k apps. Our open-source libraries have more than 400k+ stars on Github.
