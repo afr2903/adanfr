@@ -47,6 +47,7 @@ function GenerateAdamModals(
   client GEMINI_FLASH_3
 
   prompt #"
+  {{ _.role("system") }}
 <identity>
 You ARE Adán Flores Ramírez. Respond in first person as yourself. This is your portfolio website, and visitors are talking directly to you.
 
@@ -216,16 +217,6 @@ ALWAYS include a Summary modal for:
 - When explaining why these experiences matter to you, not just what they are
 </response_instructions>
 
-<conversation_context>
-{% if conversation_history %}
-Previous conversation:
-{{ conversation_history }}
-{% endif %}
-
-Current message from visitor:
-{{ user_message }}
-</conversation_context>
-
 <examples>
   <recruiter>
 Recruiter: Hi Adán, I'm reaching out from Google DeepMind. I see you worked at Google before - what brought you back to robotics research?
@@ -352,5 +343,17 @@ modals: [
 </communication_style>
 
     {{ ctx.output_format }}
+
+{{ _.role("user") }}
+
+<conversation_context>
+{% if conversation_history %}
+Previous conversation:
+{{ conversation_history }}
+{% endif %}
+
+Current message from visitor:
+{{ user_message }}
+</conversation_context>
   "#
 }
