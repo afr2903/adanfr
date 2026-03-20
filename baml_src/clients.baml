@@ -66,6 +66,17 @@ client<llm> CLAUDE_OPUS_4_5 {
   }
 }
 
+client<llm> CLAUDE_OPUS_4_6 {
+  provider "openai-generic"
+  retry_policy Constant
+  options {
+    base_url https://openrouter.ai/api/v1
+    api_key env.OPENROUTER_API_KEY
+    model "anthropic/claude-opus-4.6"
+    max_tokens 16384
+  }
+}
+
 // Fallback strategy: try Flash 3 first, then GPT-OSS-120B
 client<llm> AdamFallback {
   provider fallback

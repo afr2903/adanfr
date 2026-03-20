@@ -93,6 +93,7 @@ function GenerateResume(
   client CLAUDE_OPUS_4_5
 
   prompt #"
+{{ _.role("system") }}
 Generate a tailored resume based on the conversation context and available portfolio data.
 
 <system_goal>
@@ -100,11 +101,6 @@ You are an expert career strategist and technical writer for Adán Flores Ramír
 
 You must strictly adhere to Adán's writing style: **concise, metric-obsessed, and action-oriented.**
 </system_goal>
-
-<user_conversation>
-The user has been asking about:
-{{user_messages}}
-</user_conversation>
 
 <viewpoint_lens>
     {% if lens and lens != "none" %}
@@ -177,19 +173,113 @@ The user has been asking about:
 {{ education_context }}
 </available_education>
 
+<star_stories_examples>
+(For reference on narratives and overall career progression)
+### Question 1: Prioritizing competing customer requests
+
+**STAR skeleton:**
+
+**S:** At Riko, we were serving multiple restaurant chains simultaneously. One smaller client wanted dynamic condiment ("aderezos") calculation, where the agent would intelligently suggest and price add-ons based on the order. Another client, a larger chain, needed multi-store routing so a single phone number could route to the correct branch based on caller location or preference.
+
+**T:** Both were real requests with real revenue attached. I had to decide which to build first with a small team.
+
+**A:** I asked: which request is actually a feature that enables growth, and which is a nice-to-have for one client? The condiment logic was particular to that client's menu structure. Multi-store routing was an enabling feature: it unlocked the ability to onboard any chain with multiple locations, which was the profile of every big client in our pipeline. I chose routing, communicated to the smaller client that their request was on the roadmap but not next, and framed it as "we're building the infrastructure that will make features like yours easier to ship later."
+
+**R:** Multi-store routing became a key selling point for onboarding major chains. And when we eventually built the condiment logic, it was faster because the modular architecture was already in place.
+
+**🔑 Takeaway to internalize:** The framework is: enabling features before particular features. Always ask "does this unlock future value for multiple clients, or solve one client's specific pain?" An FDE's job is to see the pattern across requests, not just react to the loudest one.
+
+---
+
+### Question 2: Building a feature that required understanding customer operations deeply
+
+**STAR skeleton:**
+
+**S:** When we expanded Riko's delivery capability for Mexico City restaurants, we hit a problem that was invisible from a pure engineering perspective. The standard address flow (street, number, zip code, city) doesn't work in Mexico City. Most people don't know their zip code. They orient by _colonia_ (neighborhood), landmarks, and specific details like "the blue building next to the Oxxo." But the agent needs a validated, deliverable address.
+
+**T:** I had to design a conversational flow that felt natural to how people in CDMX actually give addresses, while still resolving to a real, validated location the delivery system could use.
+
+**A:** I spent time understanding how customers actually communicate addresses in calls. Then I built a disambiguation flow: the agent asks for colonia first (which is how people think about location), uses that to narrow the search space, then confirms street and number. Behind that, I integrated a searchable Google Maps object so the agent could validate in real time that the resolved address exists and is deliverable. The key insight was that the conversation design had to mirror the customer's mental model, not the database schema.
+
+**R:** The feature worked because it was designed around how people actually behave, not how systems expect them to behave. It became one of the clearest examples of why understanding local operations matters for voice AI, something a US-built solution would never get right out of the box.
+
+**🔑 Takeaway to internalize:** Great product comes from understanding the gap between how systems expect data and how real people provide it. For Yamil, this story proves you do product discovery in the field, not from a spreadsheet. This is exactly what "designing for nuances" means, which is his own language from the DHL announcement.
+
+---
+
+### Question 3: Working with engineers on requirements
+
+**STAR skeleton:**
+
+**S:** At Pefai, I was the AI Engineer implementing agents for the no-code platform, but I also had to work closely with the broader engineering team to define what we were building and how it fit into the existing product.
+
+**T:** Engineers were busy. I couldn't run open-ended brainstorms. I needed to come to sessions with a clear proposal that they could validate, challenge, or redirect.
+
+**A:** My approach: do the product thinking and scoping myself first. Define the problem, the proposed solution, the constraints, and the open questions. Then bring that to engineers in focused sessions, never longer than an hour so engagement stays high. My job was to make the session about decisions, not discovery. Discovery was my homework before the meeting. At Riko, I applied the same method with a smaller team: I would arrive with a design doc, walk through it, and the engineers' role was to poke holes and flag what I missed technically.
+
+**R:** This approach meant we shipped faster because we weren't wasting synchronous time on divergent exploration. Engineers felt respected because I wasn't asking them to do my product thinking for me, and they could focus on what they're best at: identifying technical risks and implementation paths.
+
+**🔑 Takeaway to internalize:** You lead requirements by doing the hard thinking before the meeting, not during it. The meeting is for validation and decision-making. This shows Yamil you won't be a drag on his product team's time; you'll come prepared.
+
+---
+
+### Question 4: Trade-off between customer needs and technical feasibility
+
+**STAR skeleton:**
+
+**S:** At Google Cloud on the Vertex AI self-service team, my intern project was the 3P Identity Connector Scheduler: separating a single monolithic scheduler for data pipelines into two distinct schedulers, one for entity connectors and one for identity connectors, with proper role-based access control (RBAC) separation depending on employee tiers.
+
+**T:** The ideal end-state was a clean, fully separated system. But the migration path had constraints: existing connectors were running in production, backward compatibility was non-negotiable, and I had to validate everything through staging simulations before any production changes.
+
+**A:** The trade-off was between doing a full rewrite (what would be cleanest architecturally) versus an incremental separation that maintained backward compatibility during migration. I chose the incremental approach: separate the schedulers logically first, validate with staging connector simulations, then migrate production connectors in phases. This meant the intermediate state wasn't as clean, but it was safe and verifiable at every step. I documented the decisions so the team could continue the migration after my internship ended.
+
+**R:** The separation shipped to staging successfully, with a clear migration path for production. The approach of "incremental and verifiable over clean but risky" was validated by my team's senior engineers.
+
+**🔑 Takeaway to internalize:** Trade-offs aren't just about saying no. They're about finding the path that delivers value without breaking what's already working. The framework is: what's the safest path that still moves us toward the ideal state? This is especially relevant for an FDE role where you're implementing solutions for live customers who can't afford downtime.
+
+---
+
+### Question 5: Building for growth / scalability
+
+**STAR skeleton:**
+
+**S:** At Riko, our first client's agent was tightly coupled to their specific menu, voice persona, and ordering flow. When we started conversations with a second chain, I realized we'd be rebuilding from scratch every time.
+
+**T:** I needed to refactor the architecture so new brands could be onboarded through configuration, not code changes.
+
+**A:** I redesigned the agent into modular components: a configurable menu parser (so any restaurant's menu could be loaded via the backend), a brand-specific voice persona layer (tone, vocabulary, upselling logic), and a routing engine for multi-location support. Everything was controllable through backend configuration. The principle was: if an FDE or account manager needs to touch code to onboard a client, the architecture is wrong.
+
+**R:** Onboarding new brands went from a rebuild to a configuration exercise. This became the selling point for chains: "your brand, your voice, your menu, deployed in days." It's also what kept costs under $2 MXN per minute, because we weren't doing custom engineering per client.
+
+**🔑 Takeaway to internalize:** "Build for resilience, not perfection," which you already wrote at the top of your doc. The product question behind scalability is always: what's the repeatable unit? If you can't describe the onboarding process as a repeatable template, you haven't built a platform yet, just a custom project. This maps directly to what HappyRobot did with freight and is trying to do across industries.
+
+---
+
+### Question 6 (bonus): "How would you approach onboarding a customer in a new industry?"
+
+This one isn't in your doc but could appear. Quick framework to have ready:
+
+1. **Shadow and listen.** Spend time in the customer's actual operations. Watch how they work today, before proposing anything.
+2. **Map the workflow.** Identify where voice/AI creates the most value (usually high-volume, repetitive, error-prone communication touchpoints).
+3. **Scope an MVP.** Don't try to automate everything. Pick the highest-value, lowest-risk use case and prove it works.
+4. **Iterate with data.** Use evals and call recordings to improve. Let the customer's real usage shape the product, not assumptions.
+
+**🔑 Takeaway:** This is your Riko methodology abstracted. You already did this for restaurants. The skill is the process, not the domain knowledge.
+<star_stories_examples>
+
 <few_shot_examples>
     // FULL EXAMPLE with job description 1
 Job Description "Forward Deployed Engineer - HappyRobot"
 We are looking for a versatile and highly skilled Forward Deployed Engineer based in Mexico to join our team. In this role, you will combine strong technical abilities with excellent communication skills, working directly with customers to ensure they maximize the value of HappyRobot’s AI platform. You will be involved in onboarding, implementation, and ongoing support, while also contributing to product development and innovation.
-What You’ll Do
-Customer-Facing Engineering – Work closely with customers from onboarding to ongoing usage, helping them integrate and optimize our AI solutions.
-Technical Development – Build new features, MVPs, and scalable solutions that directly impact customer outcomes.
-Full-Stack Development – Utilize React, TypeScript, Node.js, and Python to develop robust applications and tools.
-AI/ML Applications – Design, implement, and iterate on AI/ML solutions, including LLM prompting, tuning of voices, and transcribers to optimize use cases.
-Integration & APIs – Manage APIs and integrations with third-party systems to ensure seamless functionality for customers.
-Cross-Functional Collaboration – Partner with Product, Engineering, and Customer Success teams to deliver tailored solutions.
-Iterative Problem-Solving – Continuously iterate and improve AI solutions based on customer feedback and evolving requirements.
-Project Management – Prioritize and manage multiple projects under tight deadlines while maintaining high-quality results.
+What You'll Do
+Customer-Facing Engineering: Work closely with customers from onboarding to ongoing usage, helping them integrate and optimize our AI solutions.
+Technical Development: Build new features, MVPs, and scalable solutions that directly impact customer outcomes.
+Full-Stack Development: Utilize React, TypeScript, Node.js, and Python to develop robust applications and tools.
+AI/ML Applications: Design, implement, and iterate on AI/ML solutions, including LLM prompting, tuning of voices, and transcribers to optimize use cases.
+Integration & APIs: Manage APIs and integrations with third-party systems to ensure seamless functionality for customers.
+Cross-Functional Collaboration: Partner with Product, Engineering, and Customer Success teams to deliver tailored solutions.
+Iterative Problem-Solving: Continuously iterate and improve AI solutions based on customer feedback and evolving requirements.
+Project Management: Prioritize and manage multiple projects under tight deadlines while maintaining high-quality results.
 Must Have
 Strong full-stack experience: React, TypeScript, Node.js.
 Hands-on proficiency in Python.
@@ -524,10 +614,24 @@ If you're interested in joining us, but don't tick every box above, we still enc
        - Use "Jan. 2025" format.
        - If a role is "Current", use "Present".
        - Group skills logically (Languages, ML/AI, Systems).
+
+    5. **SOFT LIES:**
+      For a resume to pass the online screening, it needs to contain EVERY SINGLE detail asked in the description.
+      If there's a specific technology listed that I haven't used, either way include it:
+      1. If a technology like Azure is listed, but I have used GCP, change the bullet to use "Azure" instead of "GCP". These are interchangeable and there's no real increased complexity between one and the other, but I need to say Azure to pass the online screening.
+      2. If there's something I haven't used at all (Databricks), you still need to list it, so add it to the skills plain.
+    
+    List experiences from most recent to oldest. Usually include the current experience even if brief.
 </resume_guidelines>
 
 Generate a JSON resume following the ResumeData schema.
 
 {{ ctx.output_format }}
+
+{{ _.role("user") }}
+<user_conversation>
+The user has been asking about:
+{{user_messages}}
+</user_conversation>
   "#
 }
