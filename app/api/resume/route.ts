@@ -1,12 +1,25 @@
 import { NextResponse } from "next/server"
-import { experiences } from "@/data/experiences"
-import { projects } from "@/data/projects"
-import { education } from "@/data/education"
+import {
+  getExperiences,
+  getProjects,
+  getEducation,
+  getPrompt,
+  formatExperiencesContext,
+  formatProjectsContext,
+  formatEducationContext,
+} from "@/lib/db/content"
 import { b as bamlClient } from "../../../baml_client"
 import type { ResumeData, ResumeSection } from "@/types/resume"
 
+// ---------------------------------------------------------------------------
 // Fallback resume when BAML/LLM is unavailable
-function generateFallbackResume(userMessages: string[]): ResumeData {
+// ---------------------------------------------------------------------------
+async function generateFallbackResume(userMessages: string[]): Promise<ResumeData> {
+  const [experiences, projects, education] = await Promise.all([
+    getExperiences(),
+    getProjects(),
+    getEducation(),
+  ])
   const relevantExperiences = experiences.slice(0, 3)
   const relevantProjects = projects.slice(0, 2)
 
@@ -51,18 +64,9 @@ function generateFallbackResume(userMessages: string[]): ResumeData {
         type: "skills",
         title: "Technical Skills",
         items: [
-          {
-            category: "Languages",
-            skills: ["Python", "TypeScript", "C++", "Go", "C#"],
-          },
-          {
-            category: "Frameworks",
-            skills: ["React", "Next.js", "FastAPI", "ROS/ROS2", "PyTorch"],
-          },
-          {
-            category: "Tools",
-            skills: ["Docker", "Git", "Linux", "Unity", "BAML"],
-          },
+          { category: "Languages", skills: ["Python", "TypeScript", "C++", "Go", "C#"] },
+          { category: "Frameworks", skills: ["React", "Next.js", "FastAPI", "ROS/ROS2", "PyTorch"] },
+          { category: "Tools", skills: ["Docker", "Git", "Linux", "Unity", "BAML"] },
         ],
       } as ResumeSection,
       {
@@ -80,14 +84,14 @@ function generateFallbackResume(userMessages: string[]): ResumeData {
   }
 }
 
-// Transform BAML response to proper ResumeData format
+// ---------------------------------------------------------------------------
+// Transform BAML response to ResumeData
+// ---------------------------------------------------------------------------
 function transformBAMLResponse(bamlResponse: any): ResumeData {
   const resume = bamlResponse.resume
 
-  // Transform sections to ensure proper typing
   const transformedSections: ResumeSection[] = resume.sections.map((section: any) => {
     const type = section.type.toLowerCase()
-
     switch (type) {
       case "education":
         return {
@@ -167,8 +171,35 @@ function transformBAMLResponse(bamlResponse: any): ResumeData {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Prompt assembly — builds the full system prompt from DB content + data
+// ---------------------------------------------------------------------------
+async function assembleResumeSystemPrompt(
+  lens: string,
+  experiencesContext: string,
+  projectsContext: string,
+  educationContext: string,
+): Promise<string> {
+  const prompt = await getPrompt('resume_prompt')
+  if (!prompt) throw new Error('resume_prompt not found in database — run the seed script first')
+
+  const lensText = (lens && lens !== 'none' && prompt.lens[lens])
+    ? `The visitor is viewing your portfolio through the ${lens} lens. Adjust section priority and bullet point framing:\n${prompt.lens[lens]}`
+    : '// DEFAULT LENS\n- **Strategy:** Balanced profile showing Engineering + Research + Leadership.\n- **Section Order:** Education -> Experience -> Skills -> Projects.'
+
+  return [
+    prompt.base_prompt,
+    `\n<viewpoint_lens>\n${lensText}\n</viewpoint_lens>`,
+    `\n<available_experiences>\n${experiencesContext}\n</available_experiences>`,
+    `\n<available_projects>\n${projectsContext}\n</available_projects>`,
+    `\n<available_education>\n${educationContext}\n</available_education>`,
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// POST handler
+// ---------------------------------------------------------------------------
 export async function POST(req: Request) {
-  // return NextResponse.json({ error: "Resume generation temporarily disabled" }, { status: 503 })  // COMING SOON
   try {
     const { userMessages, lens } = (await req.json()) as { userMessages?: string[]; lens?: string }
 
@@ -180,70 +211,39 @@ export async function POST(req: Request) {
     console.log("📩 User messages count:", userMessages.length)
     console.log("🔑 OPENROUTER_API_KEY exists:", !!process.env.OPENROUTER_API_KEY)
 
-    // Try using BAML client if OPENROUTER_API_KEY is set
     if (process.env.OPENROUTER_API_KEY) {
       try {
-        console.log("🔄 Preparing context for BAML GenerateResume...")
+        console.log("🔄 Preparing context for resume generation...")
 
-        // Prepare context strings
+        const [experiences, projects, education] = await Promise.all([
+          getExperiences(),
+          getProjects(),
+          getEducation(),
+        ])
+
+        const experiencesContext = formatExperiencesContext(experiences)
+        const projectsContext = formatProjectsContext(projects)
+        const educationContext = formatEducationContext(education)
+
+        const systemPrompt = await assembleResumeSystemPrompt(
+          lens || 'none',
+          experiencesContext,
+          projectsContext,
+          educationContext,
+        )
+
         const userMessagesContext = userMessages.join("\n")
-
-        const experiencesContext = experiences
-          .map(
-            (exp) =>
-              `ID: ${exp.id}\n` +
-              `Company: ${exp.company}\n` +
-              `Role: ${exp.role}\n` +
-              `Period: ${exp.period}\n` +
-              `Description: ${exp.description}\n` +
-              `Details: ${Array.isArray(exp.details.description) ? exp.details.description.join(" ") : exp.details.description}\n` +
-              `Location: ${exp.details.location}\n` +
-              `Skills: ${exp.details.skills.join(", ")}\n`
-          )
-          .join("\n---\n")
-
-        const projectsContext = projects
-          .map(
-            (proj) =>
-              `ID: ${proj.id}\n` +
-              `Title: ${proj.title}\n` +
-              `Category: ${proj.category}\n` +
-              `Info: ${Array.isArray(proj.projectInfo) ? proj.projectInfo.join(" ") : proj.projectInfo}\n` +
-              `Technologies: ${proj.technologies}\n` +
-              `Industry: ${proj.industry}\n` +
-              `Client: ${proj.client}\n` +
-              `Date: ${proj.date}\n`
-          )
-          .join("\n---\n")
-
-        const educationContext = education
-          .map(
-            (edu) =>
-              `ID: ${edu.id}\n` +
-              `Institution: ${edu.institution}\n` +
-              `Degree: ${edu.degree}\n` +
-              `Period: ${edu.period}\n` +
-              `GPA: ${edu.gpa}\n` +
-              `Location: ${edu.location}\n` +
-              `Description: ${edu.description.join(" ")}\n` +
-              `Coursework: ${edu.coursework?.join(", ") || "N/A"}\n`
-          )
-          .join("\n---\n")
 
         console.log("🚀 Calling BAML GenerateResume...")
         const startTime = Date.now()
 
         const bamlResponse = await bamlClient.GenerateResume(
+          systemPrompt,
           userMessagesContext,
-          experiencesContext,
-          projectsContext,
-          educationContext,
-          lens || "none"
         )
 
         const duration = Date.now() - startTime
         console.log(`⏱️  BAML call completed in ${duration}ms`)
-        console.log("📦 BAML response received")
 
         if (bamlResponse && bamlResponse.resume) {
           const resumeData = transformBAMLResponse(bamlResponse)
@@ -260,9 +260,8 @@ export async function POST(req: Request) {
       console.log("⚠️  No OPENROUTER_API_KEY found, using fallback")
     }
 
-    // Fallback to heuristic resume generation
     console.log("📝 Using fallback resume generation")
-    const fallbackResume = generateFallbackResume(userMessages)
+    const fallbackResume = await generateFallbackResume(userMessages)
     return NextResponse.json({ resume: fallbackResume })
   } catch (error) {
     console.error("/api/resume error", error)

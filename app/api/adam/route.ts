@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server"
-import { experiences } from "@/data/experiences"
-import { projects } from "@/data/projects"
-import { education } from "@/data/education"
+import {
+  getExperiences,
+  getProjects,
+  getPrompt,
+  formatExperiencesContext,
+  formatProjectsContext,
+} from "@/lib/db/content"
+import type { Experience, Project } from "@/lib/db/types"
 import type { AdamModal, AdamResponse } from "@/lib/adam-types"
 import { b as bamlClient } from "../../../baml_client"
 import { Collector } from "@boundaryml/baml"
@@ -14,8 +19,11 @@ function normalizeText(value: unknown): string {
   return String(value)
 }
 
+// ---------------------------------------------------------------------------
+// Modal builders (look up from the fetched data arrays)
+// ---------------------------------------------------------------------------
 
-function buildExperienceModal(id: string): AdamModal | null {
+function buildExperienceModal(id: string, experiences: Experience[]): AdamModal | null {
   const exp = experiences.find((e) => e.id === id) as any
   if (!exp) return null
   return {
@@ -25,7 +33,6 @@ function buildExperienceModal(id: string): AdamModal | null {
     body: exp.details.description,
     images: exp.details.images,
     sourceIds: [exp.id],
-    // Enhanced fields
     technologies: exp.details?.skills || [],
     client: exp.client || exp.company,
     industry: exp.industry || null,
@@ -36,10 +43,9 @@ function buildExperienceModal(id: string): AdamModal | null {
   }
 }
 
-function buildProjectModal(id: string): AdamModal | null {
+function buildProjectModal(id: string, projects: Project[]): AdamModal | null {
   const proj = projects.find((p) => p.id === id) as any
   if (!proj) return null
-  // Parse technologies from comma-separated string
   const techArray = typeof proj.technologies === 'string'
     ? proj.technologies.split(',').map((t: string) => t.trim())
     : proj.technologies || []
@@ -50,7 +56,6 @@ function buildProjectModal(id: string): AdamModal | null {
     body: proj.projectInfo,
     images: proj.details?.images,
     sourceIds: [proj.id],
-    // Enhanced fields
     technologies: techArray,
     client: proj.client || null,
     industry: proj.industry || null,
@@ -59,28 +64,9 @@ function buildProjectModal(id: string): AdamModal | null {
   }
 }
 
-function buildEducationModal(id: string): AdamModal | null {
-  const edu = education.find((e) => e.id === id) as any
-  if (!edu) return null
-  const images = edu.images || (edu.image ? [edu.image] : [])
-  return {
-    id: `education-${edu.id}`,
-    type: "education",
-    title: `${edu.degree} — ${edu.institution}`,
-    body: edu.description,
-    images: images,
-    sourceIds: [edu.id],
-    // Enhanced fields
-    client: edu.institution,
-    date: edu.period || `${edu.startYear} - ${edu.endYear || 'Present'}`,
-    technologies: edu.coursework || [],
-  }
-}
-
-
 function buildSummaryModal(message: string, picked: AdamModal[]): AdamModal {
   const bullets = picked
-    .filter((m) => m.type !== "summary") // Don't include summary in summary
+    .filter((m) => m.type !== "summary")
     .map((m) => `• ${m.title}`)
     .join("\n")
 
@@ -99,7 +85,9 @@ function buildSummaryModal(message: string, picked: AdamModal[]): AdamModal {
   }
 }
 
-// Log analytics to MongoDB (non-blocking, fails silently if MongoDB not configured)
+// ---------------------------------------------------------------------------
+// Analytics logger
+// ---------------------------------------------------------------------------
 async function logAnalytics(data: {
   userMessage: string
   modals: any[]
@@ -109,64 +97,74 @@ async function logAnalytics(data: {
   historyLength: number
 }) {
   try {
-    if (!process.env.MONGODB_URI) {
-      return // MongoDB not configured, skip silently
-    }
+    if (!process.env.MONGODB_URI) return
 
     const db = await getDb()
     const log = data.collector.last
-    
-    // Extract model info from the selected call
     const selectedCall = log?.selectedCall || (log?.calls && log.calls.length > 0 ? log.calls[log.calls.length - 1] : null)
     const model = (selectedCall as any)?.clientName || (selectedCall as any)?.provider || 'google/gemini-3-flash-preview'
-    
-    // Extract usage info
     const usage = log?.usage || data.collector.usage
     const inputTokens = (usage as any)?.inputTokens ?? (usage as any)?.input_tokens ?? null
     const outputTokens = (usage as any)?.outputTokens ?? (usage as any)?.output_tokens ?? null
     const cachedInputTokens = (usage as any)?.cachedInputTokens ?? (usage as any)?.cached_input_tokens ?? null
-    
-    // Extract timing
     const timing = log?.timing
     const bamlLatency = (timing as any)?.durationMs ?? (timing as any)?.duration_ms ?? data.duration
 
-    // Filter out null/undefined fields from modals
     const cleanModals = data.modals.map(m => {
       const clean: any = {}
       Object.keys(m).forEach(key => {
         const value = (m as any)[key]
-        if (value !== null && value !== undefined) {
-          clean[key] = value
-        }
+        if (value !== null && value !== undefined) clean[key] = value
       })
       return clean
     })
 
     await db.collection('adam_interactions').insertOne({
       userMessage: data.userMessage,
-      modals: cleanModals, // Store modals without null fields
+      modals: cleanModals,
       modalsCount: data.modals.length,
       modalTypes: data.modals.map(m => m.type),
       lens: data.lens,
       historyLength: data.historyLength,
-      // BAML metrics
-      model: model,
+      model,
       latency: bamlLatency,
-      inputTokens: inputTokens,
-      outputTokens: outputTokens,
-      cachedInputTokens: cachedInputTokens,
+      inputTokens,
+      outputTokens,
+      cachedInputTokens,
       totalTokens: inputTokens && outputTokens ? inputTokens + outputTokens : null,
-      // Timestamps
       timestamp: Date.now(),
       createdAt: new Date()
     })
   } catch (error) {
-    // Fail silently - don't break the API if analytics fails
     console.error("Analytics logging error:", error)
   }
 }
 
+// ---------------------------------------------------------------------------
+// Prompt assembly — builds the full system prompt from DB content + data
+// ---------------------------------------------------------------------------
+async function assembleSystemPrompt(
+  lens: string,
+  experiencesContext: string,
+  projectsContext: string,
+): Promise<string> {
+  const prompt = await getPrompt('adam_prompt')
+  if (!prompt) throw new Error('adam_prompt not found in database — run the seed script first')
 
+  const lensText = (lens && lens !== 'none' && prompt.lens[lens])
+    ? `The visitor is viewing your portfolio through the ${lens} lens. Adjust your response accordingly:\n${prompt.lens[lens]}`
+    : 'No specific lens - respond naturally to the visitor\'s question.'
+
+  return [
+    prompt.base_prompt,
+    `\n<viewpoint_lens>\n${lensText}\n</viewpoint_lens>`,
+    `\n<available_data>\nMY EXPERIENCES:\n${experiencesContext}\n\nMY PROJECTS:\n${projectsContext}\n</available_data>`,
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// POST handler
+// ---------------------------------------------------------------------------
 export async function POST(req: Request) {
   try {
     const { message, lens, history } = (await req.json()) as { message?: string; lens?: string; history?: string[] }
@@ -174,7 +172,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 
-    // Format conversation history for the prompt
     const conversationHistory = Array.isArray(history) && history.length > 0
       ? history.map((h, i) => `[${i % 2 === 0 ? 'User' : 'Assistant'}]: ${h}`).join('\n')
       : ''
@@ -184,52 +181,35 @@ export async function POST(req: Request) {
     console.log("📜 Conversation history entries:", history?.length || 0)
     console.log("🔑 OPENROUTER_API_KEY exists:", !!process.env.OPENROUTER_API_KEY)
 
-    // Try using BAML client if OPENROUTER_API_KEY is set
     if (process.env.OPENROUTER_API_KEY) {
       try {
-        console.log("🔄 BAML client imported statically")
-        console.log("✅ BAML client ready, function exists:", !!bamlClient.GenerateAdamModals)
+        // Fetch data from MongoDB
+        const [experiences, projects] = await Promise.all([
+          getExperiences(),
+          getProjects(),
+        ])
 
-          // Prepare context for BAML
-          console.log("📝 Preparing context...")
-          const experiencesContext = experiences.map(exp =>
-            `ID: ${exp.id}\n` +
-            `Company: ${exp.company}\n` +
-            `Role: ${exp.role}\n` +
-            `Period: ${exp.period}\n` +
-            `Description: ${exp.description}\n` +
-            `Details: ${Array.isArray(exp.details.description) ? exp.details.description.join(' ') : exp.details.description}\n` +
-            `Skills: ${exp.details.skills.join(', ')}\n` +
-            `Images: ${exp.details.images.join(', ')}\n`
-          ).join('\n---\n')
-
-          const projectsContext = projects.map(proj =>
-            `ID: ${proj.id}\n` +
-            `Title: ${proj.title}\n` +
-            `Category: ${proj.category}\n` +
-            `Info: ${Array.isArray(proj.projectInfo) ? proj.projectInfo.join(' ') : proj.projectInfo}\n` +
-            `Technologies: ${proj.technologies}\n` +
-            `Industry: ${proj.industry}\n` +
-            `Date: ${proj.date}\n` +
-            `Images: ${proj.details?.images?.join(', ') || 'none'}\n` +
-            (proj.urls && proj.urls.length > 0
-              ? `URLs:\n${proj.urls.map(url => `  - Name: ${url.name}\n    Link: ${url.link}\n    Icon: ${url.icon || 'globe'}`).join('\n')}\n`
-              : `URLs: none\n`)
-          ).join('\n---\n')
+        const experiencesContext = formatExperiencesContext(experiences)
+        const projectsContext = formatProjectsContext(projects)
 
         console.log("📊 Context prepared - Experiences:", experiences.length, "Projects:", projects.length)
+
+        // Assemble system prompt from DB
+        const systemPrompt = await assembleSystemPrompt(lens || 'none', experiencesContext, projectsContext)
+
+        // Build user prompt
+        const userPrompt = conversationHistory
+          ? `<conversation_context>\nPrevious conversation:\n${conversationHistory}\n\nCurrent message from visitor:\n${message}\n</conversation_context>`
+          : `<conversation_context>\nCurrent message from visitor:\n${message}\n</conversation_context>`
+
         console.log("🚀 Calling BAML GenerateAdamModals...")
         console.log("🔍 Lens:", lens || 'none')
 
-        // Create collector to track usage and timing
         const collector = new Collector("adam-analytics")
         const startTime = Date.now()
         const aiResp = await bamlClient.GenerateAdamModals(
-          message, 
-          experiencesContext, 
-          projectsContext, 
-          conversationHistory, 
-          lens || 'none',
+          systemPrompt,
+          userPrompt,
           { collector }
         )
         const duration = Date.now() - startTime
@@ -237,13 +217,12 @@ export async function POST(req: Request) {
         console.log(`⏱️  BAML call completed in ${duration}ms`)
         console.log("📦 Raw BAML response:", JSON.stringify(aiResp, null, 2))
 
-        // Convert BAML response to our type (handle null values)
         const asResp: AdamResponse = {
           ...aiResp,
           modals: aiResp.modals.map(m => {
             const modal: any = {
               id: m.id,
-              type: m.type as any, // Type assertion needed due to case differences
+              type: m.type as any,
               title: m.title,
               body: m.body,
               reasoning: m.reasoning ?? undefined,
@@ -257,7 +236,6 @@ export async function POST(req: Request) {
               company: m.company ?? undefined,
               urls: m.urls ?? undefined
             }
-            // Add linkHref/linkLabel if they exist in the BAML response
             if ('linkHref' in m) modal.linkHref = (m as any).linkHref ?? undefined
             if ('linkLabel' in m) modal.linkLabel = (m as any).linkLabel ?? undefined
             return modal as AdamModal
@@ -268,33 +246,31 @@ export async function POST(req: Request) {
           console.log("✅ BAML response generated successfully")
           console.log("📋 Number of modals:", asResp.modals.length)
           console.log("📋 Modal types:", asResp.modals.map(m => m.type).join(", "))
-          
-          // Log analytics to MongoDB, use raw BAML response
+
           logAnalytics({
             userMessage: message,
-            modals: aiResp.modals as any, // Store raw BAML response with nulls
+            modals: aiResp.modals as any,
             lens: lens || 'none',
             collector,
             duration,
             historyLength: history?.length || 0
           }).catch(err => console.error("Analytics logging failed:", err))
-          
+
           return NextResponse.json(asResp)
         } else {
-          console.log("⚠️  BAML response invalid or empty, falling back to heuristics")
+          console.log("⚠️  BAML response invalid or empty")
         }
       } catch (bamlError) {
-        console.error("❌ BAML error, falling back to heuristics:")
+        console.error("❌ BAML error:")
         console.error(bamlError)
         if (bamlError instanceof Error) {
           console.error("Error stack:", bamlError.stack)
         }
       }
     } else {
-      console.log("⚠️  No OPENROUTER_API_KEY found, using heuristics")
+      console.log("⚠️  No OPENROUTER_API_KEY found")
     }
 
-    // Fallback heuristic
     console.log("Error, modals won't be generated")
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   } catch (error) {
@@ -302,5 +278,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }
-
-
