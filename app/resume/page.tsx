@@ -1,8 +1,14 @@
 import ExperienceSection from "@/components/experience-section"
 import EducationSection from "@/components/education-section"
 import SkillsSection from "@/components/skills-section"
+import { getExperiences, getEducation } from "@/lib/db/content"
 
-export default function ResumePage() {
+export default async function ResumePage() {
+  const [experiences, education] = await Promise.all([
+    getExperiences(),
+    getEducation(),
+  ])
+
   return (
     <div className="pt-24">
       <div className="container mx-auto px-4 mb-16">
@@ -13,8 +19,8 @@ export default function ResumePage() {
         </h1>
       </div>
 
-      <ExperienceSection />
-      <EducationSection />
+      <ExperienceSection experiences={experiences} />
+      <EducationSection education={education} />
       <SkillsSection />
 
       <div className="flex justify-center my-16">
