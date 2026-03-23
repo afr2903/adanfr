@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react"
-import { experiences } from "@/data/experiences"
+import type { Experience } from "@/lib/db/types"
 
-export default function ExperienceSection() {
+export default function ExperienceSection({ experiences }: { experiences: Experience[] }) {
   return (
     <section className="section bg-white text-black" id="experience">
       <div className="container max-w-7xl mx-auto">
@@ -23,7 +23,7 @@ export default function ExperienceSection() {
   )
 }
 
-function ExperienceCard({ experience }) {
+function ExperienceCard({ experience }: { experience: Experience }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 

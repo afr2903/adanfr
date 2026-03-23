@@ -3,24 +3,24 @@
 import { useState } from "react"
 import Image from "next/image"
 import { X, ExternalLink, Github, Youtube, FileText, ChevronLeft, ChevronRight } from "lucide-react"
-import { projects } from "@/data/projects"
+import type { Project } from "@/lib/db/types"
 
-export default function PortfolioSection() {
+export default function PortfolioSection({ projects }: { projects: Project[] }) {
   const [activeFilter, setActiveFilter] = useState("All")
-  const [selectedProject, setSelectedProject] = useState(null)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const filteredProjects =
     activeFilter === "All" ? projects : projects.filter((project) => project.category === activeFilter)
 
-  const handleNextImage = (e) => {
+  const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (selectedProject && selectedProject.details && selectedProject.details.images) {
       setCurrentImageIndex((prev) => (prev + 1) % selectedProject.details.images.length)
     }
   }
 
-  const handlePrevImage = (e) => {
+  const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (selectedProject && selectedProject.details && selectedProject.details.images) {
       setCurrentImageIndex((prev) => (prev === 0 ? selectedProject.details.images.length - 1 : prev - 1))

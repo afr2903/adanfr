@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react"
-import { education } from "@/data/education"
+import type { Education } from "@/lib/db/types"
 
-export default function EducationSection() {
+export default function EducationSection({ education }: { education: Education[] }) {
   return (
     <section className="section bg-[#121212] text-white" id="education">
       <div className="container max-w-7xl mx-auto">
@@ -23,26 +23,12 @@ export default function EducationSection() {
   )
 }
 
-type EducationItem = {
-  id: string
-  logo?: string
-  institution: string
-  degree: string
-  period: string
-  gpa?: string
-  location?: string
-  images?: string[]
-  image?: string
-  description: string[]
-  coursework: string[]
-}
-
-function EducationCard({ education }: { education: EducationItem }) {
+function EducationCard({ education }: { education: Education }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // Create an array of images if only a single image is provided
-  const images: string[] = education.images ? education.images : education.image ? [education.image] : []
+  const images: string[] = education.images || []
 
   const hasImages = images.length > 0
   const imageCount = images.length
@@ -147,7 +133,7 @@ function EducationCard({ education }: { education: EducationItem }) {
                   {/* Image navigation dots */}
                   {imageCount > 1 && (
                     <div className="flex justify-center mt-4 gap-2">
-                  {images.map((_image, i) => (
+                      {images.map((_image, i) => (
                         <button
                           key={i}
                           onClick={() => setCurrentImageIndex(i)}
